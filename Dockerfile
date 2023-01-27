@@ -3,6 +3,10 @@ LABEL maintainer="revelvol"
 EXPOSE 8000
 ENV PYTHONUNBUFFERED 1
 
+RUN wget https://github.com/jwilder/dockerize/releases/download/v0.6.1/dockerize-linux-amd64-v0.6.1.tar.gz \
+    && tar -C /usr/local/bin -xzvf dockerize-linux-amd64-v0.6.1.tar.gz \
+    && rm dockerize-linux-amd64-v0.6.1.tar.gz
+
 WORKDIR /app
 COPY requirements.txt /tmp/requirements.txt
 COPY requirements.dev.txt /tmp/requirements.dev.txt
@@ -19,3 +23,5 @@ RUN python -m venv /py &&\
 
 ENV PATH="/py/bin:$PATH"
 USER myuser
+
+CMD ["dockerize", "-wait", "tcp://database:5432", "-timeout", "60s", "python", "run.py"]

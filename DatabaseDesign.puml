@@ -1,0 +1,77 @@
+@startuml
+
+entity User {
+   user_id <<PK>>
+   --
+   email
+   name
+   password
+   is_staff
+   is_admin
+}
+
+entity Ingredient {
+  +ingredient_id <<PK>>
++ingredient_document_id <<FK>>
+  +supplier_id <<FK>>
+  --
+  +name
+  +price
+  +function_id
+}
+
+entity Function {
+  +function_id <<PK>>
+  --
+  +internal_name
+}
+
+entity ingredient_document {
+  +ingredient_document_id <<PK>>
+  --
+  +necesarryDocument1
+  +necesarryDocument2
+  +necesarryDocument3
+  etc
+}
+
+entity supplier {
+  +supplier_id <<PK>>
+  +supplier_document_id <<FK>>
+  --
+  +Name
+  +Location
+  +phone
+}
+
+entity supplier_document {
+  +suppler_document_id <<PK>>
+  --
+  +necesarryDocument1
+  etc
+}
+
+entity PIC{
+  +PIC_id <<PK>>
+  +supplier_id <<FK>>
+  --
+  +name
+  +position
+  +email
+  +phone
+}
+
+supplier ||--o{ Ingredient : has multiple
+
+supplier ||--o| supplier_document : may have
+
+Function ||--o{ Ingredient : have internal code
+
+Ingredient ||--o| ingredient_document : may have
+
+supplier ||--|{ PIC : have multiple PIC
+
+@enduml
+
+
+
