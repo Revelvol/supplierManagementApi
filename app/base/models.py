@@ -18,6 +18,7 @@ class MyUserManager(BaseUserManager):
             name=name,
         )
         user.set_password(password)
+
         user.save(using=self._db)
         return user
 
@@ -45,6 +46,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=True)
     objects = MyUserManager()
+    groups = models.ManyToManyField(Group, blank=True)
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
 

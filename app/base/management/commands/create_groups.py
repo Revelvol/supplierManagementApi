@@ -16,7 +16,7 @@ class Command(BaseCommand):
 
             viewer_group, created = Group.objects.get_or_create(name='viewer')
             viewer_group.permissions.add(view_perm)
-            staff_group, created = Group.objects.get_or_create(name='staff')
+            staff_group, created = Group.objects.get_or_create(name='editor')
             staff_group.permissions.add(view_perm, add_perm, change_perm, delete_perm)
 
         except Exception as e:
