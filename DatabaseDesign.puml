@@ -6,7 +6,7 @@ entity User {
    email
    name
    password
-   is_staff
+   is_active
    is_admin
 }
 
@@ -61,6 +61,13 @@ entity PIC{
   +phone
 }
 
+entity Group {
++group.id <<PK>>
+--
++view only
+add more things as needed
+}
+
 supplier ||--o{ Ingredient : has multiple
 
 supplier ||--o| supplier_document : may have
@@ -70,6 +77,8 @@ Function ||--o{ Ingredient : have internal code
 Ingredient ||--o| ingredient_document : may have
 
 supplier ||--|{ PIC : have multiple PIC
+
+User }|--|{ Group
 
 @enduml
 
