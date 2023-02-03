@@ -18,6 +18,7 @@ services:
       - ./app:/app
       - ./wait-for-it.sh:/wait-for-it.sh
     user: myuser
+
     depends_on:
       - db
 
