@@ -1,5 +1,5 @@
-from base.models import User
-from .serializers import UserSerializer
+from .serializers import (UserSerializer,
+                          AuthTokenSerializer)
 from django.http import Http404
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -8,7 +8,25 @@ from rest_framework.authentication import SessionAuthentication, BasicAuthentica
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from django.contrib.auth import get_user_model
+from rest_framework.authtoken.models import Token
 
 
-class CreateUserView(generics.CreateAPIView):
+class CreateUserView(generics.CreateAPIView, generics.ListAPIView):
     serializer_class = UserSerializer
+
+    def get_queryset(self):
+        return get_user_model().objects.all()
+
+
+class CreateTokenView(generics.CreateAPIView):
+    serializer_class = AuthTokenSerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            user = serializer.validated_data.get('user')
+            token, created = Token.objects.get_or_create(user=user)
+            return Response({'token': token.key}, status.HTTP_200_OK)
+        return Response({'error': 'Invalid credentials'}, status=status.HTTP_400_BAD_REQUEST)
+

@@ -23,6 +23,7 @@ def create_super_user():
 
 
 CREATE_USER_URL = reverse('user:create')
+CREATE_TOKEN_URL = reverse('user:token')
 
 
 class PublicTestApi(TestCase):
@@ -44,12 +45,32 @@ class PublicTestApi(TestCase):
 
     def test_create_user_fail(self):
         payload = {
-            'email': 'julius@gmail.com',
+            'email': 'juliussutandi@gmail.com',
             'password': 'hell',
         }
         res = self.client.post(CREATE_USER_URL, payload)
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertFalse(get_user_model().objects.all().count(), 1)
+
+    def test_create_token_success(self):
+        create_user()
+        payload = {
+            'email': 'juliussutandi@gmail.com',
+            'password': 'testing1sada1',
+        }
+        res = self.client.post(CREATE_TOKEN_URL, payload)
+        self.assertEqual(res.status_code, 200)
+        self.assertIn('token', res.data)
+
+    def test_create_token_fail(self):
+        create_user()
+        payload = {
+            'email': 'julius@gmail.com',
+            'password': 'testing1a1',
+        }
+        res = self.client.post(CREATE_TOKEN_URL, payload)
+        self.assertEqual(res.status_code, 400)
+
 
 #ME_URL = reverse('user:me')
 class PrivateTestApi(TestCase):

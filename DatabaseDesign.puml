@@ -7,7 +7,7 @@ entity User {
    name
    password
    is_active
-   is_admin
+   is_staff (if staff have write access)
 }
 
 entity Ingredient {
@@ -61,12 +61,7 @@ entity PIC{
   +phone
 }
 
-entity Group {
-+group.id <<PK>>
---
-+view only
-add more things as needed
-}
+
 
 supplier ||--o{ Ingredient : has multiple
 
@@ -78,7 +73,6 @@ Ingredient ||--o| ingredient_document : may have
 
 supplier ||--|{ PIC : have multiple PIC
 
-User }|--|{ Group
 
 @enduml
 
