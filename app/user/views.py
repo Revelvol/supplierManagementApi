@@ -14,12 +14,14 @@ from rest_framework import authentication, permissions
 
 
 class CreateUserView(generics.CreateAPIView, generics.ListAPIView):
+    """Create new user"""
     serializer_class = UserSerializer
 
     def get_queryset(self):
         return get_user_model().objects.all()
 
 class ManageUserView(generics.RetrieveUpdateAPIView):
+    """edit the authenticated user by token"""
     authentication_classes = [authentication.TokenAuthentication]
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = UserSerializer
@@ -28,6 +30,7 @@ class ManageUserView(generics.RetrieveUpdateAPIView):
         return self.request.user
 
 class CreateTokenView(generics.CreateAPIView):
+    """create token for registered user"""
     serializer_class = AuthTokenSerializer
 
     def create(self, request, *args, **kwargs):

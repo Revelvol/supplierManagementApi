@@ -5,5 +5,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
-    path('api/', include('user.urls'))
+    path('api/user/', include('user.urls')),
+    path('api/', include('ingredient.urls')), # this is with router so no need stuff
 ]
