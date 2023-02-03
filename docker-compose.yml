@@ -11,10 +11,12 @@ services:
       - DB_HOST=db
 
     command: >
-      sh -c " python manage.py migrate &&
+      sh -c "  /wait-for-it.sh db:5432 &&
+              python manage.py migrate &&
               python manage.py runserver 0.0.0.0:8000"
     volumes:
       - ./app:/app
+      - ./wait-for-it.sh:/wait-for-it.sh
     user: myuser
     depends_on:
       - db
