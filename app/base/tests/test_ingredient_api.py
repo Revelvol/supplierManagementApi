@@ -1,8 +1,8 @@
 from django.test import TestCase
 from base.models import Ingredient
 from django.contrib.auth import get_user_model
-
-
+from rest_framework.test import APIClient
+from django.urls import reverse
 def create_user():
     user = get_user_model().objects.create_user(name='julius',
                                                 email='juliussutandi@gmail.com',
@@ -30,8 +30,16 @@ def create_ingredient():
     return ingredient
 
 
+INGREDIENT_URL = reverse('ingredient:ingredients')
+
+
 class PublicTestApi(TestCase):
-    pass
+    def setUp(self):
+        self.client = APIClient()
+    def test_public_ingredient_access(self):
+        pass
+
 
 class PrivateTestApi(TestCase):
-    pass
+    def setUp(self):
+        pass
