@@ -51,9 +51,7 @@ class PublicTestApi(TestCase):
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertFalse(get_user_model().objects.all().count(), 1)
 
-ME_URL = reverse('user:me')
-
-
+#ME_URL = reverse('user:me')
 class PrivateTestApi(TestCase):
     def setUp(self):
         self.client = APIClient()

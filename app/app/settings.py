@@ -137,12 +137,3 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
     ]
 }
-
-SPECTACULAR_SETTINGS = {
-    'TITLE': 'supplier Management API',
-    'DESCRIPTION': 'This API will cover the authentication and authorization system'
-                   'as well as documentation for managing each of the models',
-    'VERSION': '1.0.0',
-    'SERVE_INCLUDE_SCHEMA': False,
-
-}
