@@ -24,6 +24,7 @@ def create_super_user():
 
 CREATE_USER_URL = reverse('user:create')
 CREATE_TOKEN_URL = reverse('user:token')
+ME_URL = reverse('user:me')
 
 
 class PublicTestApi(TestCase):
@@ -71,8 +72,51 @@ class PublicTestApi(TestCase):
         res = self.client.post(CREATE_TOKEN_URL, payload)
         self.assertEqual(res.status_code, 400)
 
+    def test_retrieve_me_fail(self):
+        res = self.client.get(ME_URL)
+        self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
-#ME_URL = reverse('user:me')
+
 class PrivateTestApi(TestCase):
     def setUp(self):
         self.client = APIClient()
+        self.user = create_user()
+        self.client.force_authenticate(self.user)
+
+    def test_retrieve_me_success(self):
+        res = self.client.get(ME_URL)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+    def test_patch_me_sucess(self):
+
+        payload = {
+            'name': 'kentel',
+            'password': '1231243141353523'
+        }
+        res = self.client.patch(ME_URL, payload)
+        self.user.refresh_from_db()
+        self.assertTrue(self.user.check_password(payload['password']))
+        self.assertEqual(self.user.name, payload['name'])
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+    def test_put_me_sucess(self):
+        payload = {
+            'name': 'kentel',
+            'email': 'juliu@gmail.com',
+            'password': '1231243141353523'
+        }
+        res = self.client.put(ME_URL, payload)
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.name, payload['name'])
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+    def test_put_me_fail(self):
+        payload = {
+            'name': 'kentel',
+            'email': 'juliu@gmail.com'
+        }
+        res = self.client.put(ME_URL, payload)
+        self.user.refresh_from_db()
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
+
+

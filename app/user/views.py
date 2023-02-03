@@ -10,6 +10,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.contrib.auth import get_user_model
 from rest_framework.authtoken.models import Token
+from rest_framework import authentication, permissions
 
 
 class CreateUserView(generics.CreateAPIView, generics.ListAPIView):
@@ -18,6 +19,13 @@ class CreateUserView(generics.CreateAPIView, generics.ListAPIView):
     def get_queryset(self):
         return get_user_model().objects.all()
 
+class ManageUserView(generics.RetrieveUpdateAPIView):
+    authentication_classes = [authentication.TokenAuthentication]
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = UserSerializer
+
+    def get_object(self):
+        return self.request.user
 
 class CreateTokenView(generics.CreateAPIView):
     serializer_class = AuthTokenSerializer
@@ -29,4 +37,6 @@ class CreateTokenView(generics.CreateAPIView):
             token, created = Token.objects.get_or_create(user=user)
             return Response({'token': token.key}, status.HTTP_200_OK)
         return Response({'error': 'Invalid credentials'}, status=status.HTTP_400_BAD_REQUEST)
+
+
 

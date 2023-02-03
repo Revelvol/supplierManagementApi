@@ -6,7 +6,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
         fields = ['name', 'email', 'password', 'is_active', 'is_staff', 'groups']
-        read_only_fields = ['groups', 'is_active']
+        read_only_fields = ['is_staff', 'groups', 'is_active']
         extra_kwargs = {'password': {'write_only': True,
                                      'help_text': 'Password should be at least 8 characters long.',
                                      'min_length': 8, },
@@ -15,6 +15,17 @@ class UserSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         return get_user_model().objects.create_user(**validated_data)
+
+    def update(self, instance, validated_data):
+        password = validated_data.pop('password', None)
+        user = super().update(instance, validated_data)
+        if password:
+            user.set_password(password)
+            user.save()
+        return user
+
+
+
 
 
 class AuthTokenSerializer(serializers.Serializer):
