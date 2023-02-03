@@ -37,11 +37,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'drf_spectacular',
+    # app inside the project
     'base.apps.BaseConfig',
     'user.apps.UserConfig',
+    'ingredient.apps.IngredientConfig',
+    # dependencies based on requirement
     'rest_framework',
     'rest_framework.authtoken',
+    'drf_spectacular',
 ]
 
 MIDDLEWARE = [
