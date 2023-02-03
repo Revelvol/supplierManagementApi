@@ -2,7 +2,19 @@ from django.db import models
 from django.contrib.auth.models import (
     BaseUserManager, AbstractBaseUser, PermissionsMixin
 )
+import math
 from django.contrib.auth.models import Group
+from django.db import models
+
+
+class RoundedDecimalField(models.DecimalField):
+    def from_db_value(self, value, expression, connection, context):
+        return round(value, 2)
+
+    def to_python(self, value):
+        value = round(super().to_python(value), 2)
+        return math.ceil(value * 100) / 100
+
 
 class MyUserManager(BaseUserManager):
     def create_user(self, email, name=None, password=None, *args, **kwargs):
@@ -42,7 +54,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         max_length=255,
         unique=True,
     )
-    name = models.CharField(max_length=255, null=True, blank=True )
+    name = models.CharField(max_length=255, null=True, blank=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=True)
     objects = MyUserManager()
@@ -54,3 +66,14 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.email
 
 
+class Ingredient(models.Model):
+    name = models.CharField(max_length=255)
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    quantity = models.DecimalField(max_digits=10, decimal_places=2)
+    is_used = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ['-name']
+
+    def __str__(self):
+        return self.name

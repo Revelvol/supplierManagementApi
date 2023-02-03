@@ -3,6 +3,7 @@ from django.contrib.auth import get_user_model
 from io import StringIO
 from django.core.management import call_command
 from django.contrib.auth.models import Group
+from base.models import Ingredient
 
 
 def create_user():
@@ -71,3 +72,18 @@ class ModelTestCase(TestCase):
         user2.groups.add(viewer_group, editor_group)
         self.assertIn(viewer_group, user2.groups.all())
         self.assertIn(editor_group, user2.groups.all())
+
+    def test_ingredient_model_base_successful(self):
+        name = 'IngredientA Washed up 500'
+        quantity = 1
+        price = 10.20
+        is_used = True
+
+        ingredient = Ingredient.objects.create(name=name,
+                                               quantity=quantity,
+                                               price=price,
+                                               is_used=is_used)
+        self.assertEqual(ingredient.name, name)
+        self.assertEqual(ingredient.quantity, quantity)
+        self.assertEqual(ingredient.price, price)
+        self.assertTrue(ingredient.is_used)

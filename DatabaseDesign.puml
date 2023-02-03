@@ -14,10 +14,13 @@ entity Ingredient {
   +ingredient_id <<PK>>
 +ingredient_document_id <<FK>>
   +supplier_id <<FK>>
+  +function_id <<FK>>
+  +unit_id <<fk>>
   --
   +name
   +price
-  +function_id
+  +quantity
+  +is_used
 }
 
 entity Function {
@@ -35,6 +38,13 @@ entity ingredient_document {
   etc
 }
 
+entity unit {
++ unit_id <<PK>>
+--
++name
++abbreviation
++convertion_rate
+}
 entity supplier {
   +supplier_id <<PK>>
   +supplier_document_id <<FK>>
@@ -73,6 +83,7 @@ Ingredient ||--o| ingredient_document : may have
 
 supplier ||--|{ PIC : have multiple PIC
 
+Ingredient }|--|| unit
 
 @enduml
 
