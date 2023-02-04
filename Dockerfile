@@ -19,5 +19,3 @@ RUN python -m venv /py &&\
 
 ENV PATH="/py/bin:$PATH"
 USER myuser
-
-CMD ["dockerize", "-wait", "tcp://database:5432", "-timeout", "60s", "python", "run.py"]
