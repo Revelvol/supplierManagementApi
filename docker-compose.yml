@@ -26,7 +26,6 @@ services:
 
   db:
     image: "postgres:15.1-alpine"
-    hostname: postgres
     volumes:
       - postgres:/dev/lib/postgresql/data
     environment:
