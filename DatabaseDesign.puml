@@ -50,7 +50,7 @@ entity supplier {
   +supplier_document_id <<FK>>
   --
   +Name
-  +Location
+  +Location (might be extended)
   +phone
 }
 

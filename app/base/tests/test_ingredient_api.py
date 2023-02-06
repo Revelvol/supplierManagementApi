@@ -33,6 +33,9 @@ def create_ingredient():
 
 INGREDIENT_URL = reverse('ingredient:ingredient-list')
 
+def detail_ingredient_url(ingredient_id):
+    """Create and return a tag detail url."""
+    return reverse('ingredient:ingredient-detail', args=[ingredient_id])
 
 class PublicTestApi(TestCase):
     def setUp(self):

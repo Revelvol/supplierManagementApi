@@ -1,4 +1,6 @@
-from .models import User, Ingredient
+from .models import (User, Ingredient,
+                     Function, Supplier,
+                     Pic, Unit)
 from django import forms
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
@@ -65,7 +67,7 @@ class UserAdmin(BaseUserAdmin):
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('email', 'name', 'password1', 'password2','groups'),
+            'fields': ('email', 'name', 'password1', 'password2', 'groups'),
         }),
     )
     search_fields = ('email',)
@@ -76,5 +78,7 @@ class UserAdmin(BaseUserAdmin):
 
 admin.site.register(User, UserAdmin)
 admin.site.register(Ingredient)
-
-
+admin.site.register(Function)
+admin.site.register(Supplier)
+admin.site.register(Pic)
+admin.site.register(Unit)

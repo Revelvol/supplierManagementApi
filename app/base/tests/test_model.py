@@ -3,7 +3,11 @@ from django.contrib.auth import get_user_model
 from io import StringIO
 from django.core.management import call_command
 from django.contrib.auth.models import Group
-from base.models import Ingredient
+from base.models import (Ingredient,
+                         Function,
+                         Unit,
+                         Supplier,
+                         Pic,)
 
 
 def create_user():
@@ -87,3 +91,46 @@ class ModelTestCase(TestCase):
         self.assertEqual(ingredient.quantity, quantity)
         self.assertEqual(ingredient.price, price)
         self.assertTrue(ingredient.is_used)
+
+    def test_function_model_successful(self):
+        name = 'Hydrochloric Acid'
+
+        function = Function.objects.create(name=name)
+
+        self.assertEqual(function.name, name)
+
+    def test_unit_model_successful(self):
+        name = 'ounce'
+        abbreviation = 'oz'
+        conversion_rate = 28.3
+
+        unit = Unit.objects.create(name=name, abbreviation=abbreviation, conversion_rate=conversion_rate)
+
+        self.assertEqual(unit.name, name)
+        self.assertEqual(unit.abbreviation, abbreviation)
+        self.assertEqual(unit.conversion_rate, conversion_rate)
+
+    def test_supplier_model_successful(self):
+        name = 'Hydrochloric Acid'
+        location = 'Bekasi, Indonesia'
+        phone = '+62081231235123'
+
+        supplier = Supplier.objects.create(name=name, location=location, phone=phone)
+
+        self.assertEqual(supplier.name, name)
+        self.assertEqual(supplier.location, location)
+        self.assertEqual(supplier.phone, phone)
+
+    def test_pic_model_successfull(self):
+        name = 'sadadsaadasdas'
+        position = ' on top of the world baby'
+        email = 'clas12345@gmail.com'
+
+        pic = Pic.objects.create(name=name, position=position, email=email)
+
+        self.assertEqual(pic.name, name)
+        self.assertEqual(pic.position, position)
+        self.assertEqual(pic.email, email)
+
+
+
