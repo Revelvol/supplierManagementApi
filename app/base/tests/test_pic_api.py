@@ -31,8 +31,8 @@ def create_pic():
     name = 'andi1234'
     email = 'test@example.com'
     phone = '+62866094'
-    positon = 'leader a'
-    pic = Pic.objects.create(name=name, email=email, phone=phone, positon=positon)
+    position = 'leader a'
+    pic = Pic.objects.create(name=name, email=email, phone=phone, position=position)
     return pic
 
 
@@ -59,14 +59,32 @@ class PrivateTestApi(TestCase):
 
     def test_create_pic_successful(self):
         payload = {
-            'name': 'supplier2',
-            'position': 'asdasdasd',
+            'name': 'bengki',
+            'position': 'staff',
             'phone': '+62812312123',
             'email': 'test@example.com',
+            'supplier': {'name': 'supplier1',
+                          'location': 'asdajsdasdasd13'}
         }
-        res = self.client.post(PIC_URL, payload)
+        res = self.client.post(PIC_URL, payload, format='json')
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         function = res.data
         for key, value in payload.items():
+            if key == 'supplier':
+                continue
             self.assertEqual(function[key], value)
 
+    def test_patch_pic_successful(self):
+        pic = create_pic()
+        payload = {
+            'name': 'bengki',
+            'position': 'staff',
+            'phone': '+62812312123',
+            'supplier': {'name': 'supplier2',
+                          'location': 'asdajsdasdasd13'}
+        }
+        detail_url = detail_pic_url(pic.id)
+        res = self.client.patch(detail_url, payload, format='json')
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        pic.refresh_from_db()
+        self.assertEqual(pic.name, payload['name'])

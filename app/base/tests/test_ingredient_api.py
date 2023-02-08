@@ -1,9 +1,11 @@
 from django.test import TestCase
-from base.models import Ingredient
+from base.models import Ingredient, Function
 from django.contrib.auth import get_user_model
 from rest_framework.test import APIClient
 from django.urls import reverse
 from rest_framework import status
+
+
 def create_user():
     user = get_user_model().objects.create_user(name='julius',
                                                 email='juliussutandi@gmail.com',
@@ -31,11 +33,19 @@ def create_ingredient():
     return ingredient
 
 
+def create_function():
+    name = 'Emulsifier Food'
+    function = Function.objects.create(name=name)
+    return function
+
+
 INGREDIENT_URL = reverse('ingredient:ingredient-list')
+
 
 def detail_ingredient_url(ingredient_id):
     """Create and return a tag detail url."""
     return reverse('ingredient:ingredient-detail', args=[ingredient_id])
+
 
 class PublicTestApi(TestCase):
     def setUp(self):
@@ -44,7 +54,7 @@ class PublicTestApi(TestCase):
     def test_public_ingredient_access_unauthorized(self):
         payload = {
             'name': 'hello',
-            'quantity' : 2.00,
+            'quantity': 2.00,
             'price': 10.30,
             'is_used': True
         }
@@ -59,13 +69,26 @@ class PrivateTestApi(TestCase):
         self.client.force_authenticate(self.user)
 
     def test_create_ingredient_successful(self):
+        function = create_function()
         payload = {
             'name': 'hello',
             'quantity': 2.0,
             'price': 10.30,
-            'is_used': True
+            'is_used': True,
+            'function': {
+                'name': 'Emulsifier Food'
+            },
+            'unit': {
+                'name': 'grams',
+                'abbreviation': 'gr',
+                'conversion_rate': 1
+            },
+            'supplier': {
+                'name': 'supplier2',
+                'location': 'asdajsdasdasd13'
+            }
         }
-        res = self.client.post(INGREDIENT_URL, payload)
+        res = self.client.post(INGREDIENT_URL, payload, format='json')
 
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         ingredient = res.data
@@ -83,5 +106,3 @@ class PrivateTestApi(TestCase):
         res = self.client.post(INGREDIENT_URL, payload)
 
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
-
-

@@ -81,9 +81,9 @@ Function ||--o{ Ingredient : have internal code
 
 Ingredient ||--o| ingredient_document : may have
 
-supplier ||--|{ PIC : have multiple PIC
+supplier ||--o{ PIC : have multiple PIC
 
-Ingredient }|--|| unit
+Ingredient }o--|| unit
 
 @enduml
 
