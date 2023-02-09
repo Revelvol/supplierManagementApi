@@ -83,10 +83,6 @@ class PrivateTestApi(TestCase):
                 'abbreviation': 'gr',
                 'conversion_rate': 1
             },
-            'supplier': {
-                'name': 'supplier2',
-                'location': 'asdajsdasdasd13'
-            }
         }
         res = self.client.post(INGREDIENT_URL, payload, format='json')
 

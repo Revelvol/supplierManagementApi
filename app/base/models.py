@@ -7,6 +7,7 @@ from django.contrib.auth.models import Group
 from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
 
+
 class RoundedDecimalField(models.DecimalField):
     def from_db_value(self, value, expression, connection, context):
         return round(value, 2)

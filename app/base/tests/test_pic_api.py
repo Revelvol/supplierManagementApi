@@ -63,8 +63,6 @@ class PrivateTestApi(TestCase):
             'position': 'staff',
             'phone': '+62812312123',
             'email': 'test@example.com',
-            'supplier': {'name': 'supplier1',
-                          'location': 'asdajsdasdasd13'}
         }
         res = self.client.post(PIC_URL, payload, format='json')
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
@@ -80,8 +78,6 @@ class PrivateTestApi(TestCase):
             'name': 'bengki',
             'position': 'staff',
             'phone': '+62812312123',
-            'supplier': {'name': 'supplier2',
-                          'location': 'asdajsdasdasd13'}
         }
         detail_url = detail_pic_url(pic.id)
         res = self.client.patch(detail_url, payload, format='json')
