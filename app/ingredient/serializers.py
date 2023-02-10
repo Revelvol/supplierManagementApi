@@ -40,13 +40,28 @@ class IngredientSerializer(serializers.ModelSerializer):
                   'price', 'quantity',
                   'is_used', 'function', 'unit']
         read_only_fields = ['id', 'is_used', ]
+    def _find_and_create_unit(self, unit_data):
+        unit, created = Unit.objects.get_or_create(
+            name=unit_data.get('name'),
+            defaults={
+                'abbreviation': unit_data.get('abbreviation'),
+                'conversion_rate': unit_data.get('conversion_rate')
+            }
+        )
+
+        if not created:
+            unit.abbreviation = unit_data.get('abbreviation', unit.abbreviation)
+            unit.conversion_rate = unit_data.get('conversion_rate', unit.conversion_rate)
+            unit.save()
+
+        return unit
 
     def create(self, validated_data):
-        function_data = validated_data.pop('function')
-        unit_data = validated_data.pop('unit')
+        function_data = validated_data.pop('function', {})
+        unit_data = validated_data.pop('unit', {})
 
         function, created = Function.objects.get_or_create(**function_data)
-        unit, created = Unit.objects.get_or_create(**unit_data)
+        unit = self._find_and_create_unit(unit_data=unit_data)
 
         ingredient = Ingredient.objects.create(function=function
                                                , unit=unit, **validated_data)
@@ -54,8 +69,8 @@ class IngredientSerializer(serializers.ModelSerializer):
         return ingredient
 
     def update(self, instance, validated_data):
-        function_data = validated_data.pop('function')
-        unit_data = validated_data.pop('unit')
+        function_data = validated_data.pop('function',{})
+        unit_data = validated_data.pop('unit', {})
 
         function, created = Function.objects.get_or_create(**function_data)
         if not created:
@@ -73,8 +88,8 @@ class IngredientSerializer(serializers.ModelSerializer):
 
 
 class SupplierSerializer(serializers.ModelSerializer):
-    pic = PicSerializer(required=False, many=True)
-    ingredient = IngredientSerializer(required=False, many=True)
+    pic = PicSerializer(required=False, many=True, write_only=True)
+    ingredient = IngredientSerializer(required=False, many=True, write_only=True)
 
     class Meta:
         model = Supplier
@@ -82,12 +97,12 @@ class SupplierSerializer(serializers.ModelSerializer):
         read_only_fields = ['id']
 
     def create(self, validated_data):
-        pic_data = validated_data.pop('pic', [])
-        ingredient_data = validated_data.pop('ingredient', [])
+        pic_data = validated_data.pop('pic', {})
+        ingredient_data = validated_data.pop('ingredient', {})
         supplier, created = Supplier.objects.get_or_create(**validated_data)
         for ingredient in ingredient_data:
-            function_data = ingredient.pop('function', [])
-            unit_data = ingredient.pop('unit', [])
+            function_data = ingredient.pop('function', {})
+            unit_data = ingredient.pop('unit', {})
 
             function, created = Function.objects.get_or_create(**function_data)
             unit, created = Unit.objects.get_or_create(**unit_data)
@@ -101,16 +116,6 @@ class SupplierSerializer(serializers.ModelSerializer):
         pic_data = validated_data.pop('pic', [])
         ingredient_data = validated_data.pop('ingredient', [])
         supplier = super().update(instance, validated_data)
-        for pic in pic_data:
-            pic_obj, created = Pic.objects.get_or_create(supplier=supplier, **pic)
-            if not created:
-                pic_obj.__dict__.update(pic)
-        for ingredient in ingredient_data:
-            function_data = ingredient.pop('function')
-            unit_data = ingredient.pop('unit')
-            ing_obj, created = Ingredient.objects.get_or_create(supplier=supplier, **ingredient)
-            if not created:
-                ing_obj.__dict__.update(ingredient)
         return supplier
 
 

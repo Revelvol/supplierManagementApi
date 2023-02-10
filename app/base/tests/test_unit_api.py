@@ -28,7 +28,7 @@ def create_super_user():
     return user
 
 
-def create_function():
+def create_unit():
     name = 'grams'
     abbreviation = 'gr'
     conversion_rate = 1000.00

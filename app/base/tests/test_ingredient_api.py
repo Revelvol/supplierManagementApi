@@ -1,5 +1,5 @@
 from django.test import TestCase
-from base.models import Ingredient, Function
+from base.models import Ingredient, Function, Unit
 from django.contrib.auth import get_user_model
 from rest_framework.test import APIClient
 from django.urls import reverse
@@ -37,6 +37,14 @@ def create_function():
     name = 'Emulsifier Food'
     function = Function.objects.create(name=name)
     return function
+
+
+def create_unit():
+    name = 'grams'
+    abbreviation = 'gr'
+    conversion_rate = 1000.00
+    unit = Unit.objects.create(name=name, abbreviation=abbreviation, conversion_rate=conversion_rate)
+    return unit
 
 
 INGREDIENT_URL = reverse('ingredient:ingredient-list')
@@ -93,7 +101,7 @@ class PrivateTestApi(TestCase):
                 continue
             self.assertEqual(ingredient[key], value)
 
-    def test_create_ingredient_fail_no_name(self):
+    def test_create_ingredient_fail_no_name_and_no_unit(self):
         payload = {
             'quantity': 2.00,
             'price': 10.30,
@@ -102,3 +110,27 @@ class PrivateTestApi(TestCase):
         res = self.client.post(INGREDIENT_URL, payload)
 
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_create_function_inside_ingredient_with_same_name(self):
+        create_unit()
+        payload = {
+            'name': 'hello',
+            'quantity': 2.0,
+            'price': 10.30,
+            'is_used': True,
+            'function': {
+                'name': 'Emulsifier Food'
+            },
+            'unit': {
+                'name': 'grams',
+                'abbreviation': 'gr',
+                'conversion_rate': 1
+            },
+        }
+
+        res = self.client.post(INGREDIENT_URL, payload, format='json')
+
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+
+        self.assertEqual(1, Unit.objects.all().count())
+

@@ -76,6 +76,7 @@ class Function(models.Model):
     def __str__(self):
         return self.name
 
+
 class Unit(models.Model):
     name = models.CharField(max_length=255)
     abbreviation = models.CharField(max_length=5)
@@ -124,6 +125,7 @@ class Pic(models.Model):
 
     class Meta:
         ordering = ['-name']
+        unique_together = ('name', 'email', 'position', 'email')
 
     def __str__(self):
         return self.name
