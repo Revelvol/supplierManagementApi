@@ -10,7 +10,7 @@ from base.models import (Ingredient,
                          Unit,
                          Supplier,
                          Pic,)
-from rest_framework import status, generics, viewsets
+from rest_framework import viewsets
 from base.permissions import ReadOnly
 
 

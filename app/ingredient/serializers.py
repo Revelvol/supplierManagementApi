@@ -1,5 +1,4 @@
 from rest_framework import serializers
-from django.contrib.auth import get_user_model, authenticate
 from base.models import (Ingredient,
                          Function,
                          Unit,
@@ -40,7 +39,8 @@ class IngredientSerializer(serializers.ModelSerializer):
                   'price', 'quantity',
                   'is_used', 'function', 'unit']
         read_only_fields = ['id', 'is_used', ]
-    def _find_and_create_unit(self, unit_data):
+
+    def _find_and_create_unit(self, unit_data): # still have bug where the returned value is still updated
         unit, created = Unit.objects.get_or_create(
             name=unit_data.get('name'),
             defaults={
@@ -56,11 +56,12 @@ class IngredientSerializer(serializers.ModelSerializer):
 
         return unit
 
+
     def create(self, validated_data):
         function_data = validated_data.pop('function', {})
         unit_data = validated_data.pop('unit', {})
 
-        function, created = Function.objects.get_or_create(**function_data)
+        function , created = Function.objects.get_or_create(**function_data)
         unit = self._find_and_create_unit(unit_data=unit_data)
 
         ingredient = Ingredient.objects.create(function=function
@@ -73,12 +74,7 @@ class IngredientSerializer(serializers.ModelSerializer):
         unit_data = validated_data.pop('unit', {})
 
         function, created = Function.objects.get_or_create(**function_data)
-        if not created:
-            function.__dict__.update(function_data)
-        unit, created = Unit.objects.get_or_create(**unit_data)
-        if not created:
-            unit.__dict__.update(unit_data)
-
+        unit = self._find_and_create_unit(unit_data=unit_data)
         ingredient = super().update(instance, validated_data)
 
         ingredient.function = function

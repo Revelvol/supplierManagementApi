@@ -125,7 +125,7 @@ class Pic(models.Model):
 
     class Meta:
         ordering = ['-name']
-        unique_together = ('name', 'email', 'position', 'email')
+
 
     def __str__(self):
         return self.name

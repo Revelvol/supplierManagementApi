@@ -20,21 +20,8 @@ def create_super_user():
     return user
 
 
-def create_ingredient():
-    name = 'IngredientA Washed up 500'
-    quantity = 1.00
-    price = 10.20
-    is_used = True
-
-    ingredient = Ingredient.objects.create(name=name,
-                                           quantity=quantity,
-                                           price=price,
-                                           is_used=is_used)
-    return ingredient
-
-
 def create_function():
-    name = 'Emulsifier Food'
+    name = 'Emulsifier'
     function = Function.objects.create(name=name)
     return function
 
@@ -45,6 +32,23 @@ def create_unit():
     conversion_rate = 1000.00
     unit = Unit.objects.create(name=name, abbreviation=abbreviation, conversion_rate=conversion_rate)
     return unit
+
+
+def create_ingredient():
+    name = 'IngredientA Washed up 500'
+    quantity = 1.00
+    price = 10.20
+    is_used = True
+    unit = create_unit()
+    function = create_function()
+
+    ingredient = Ingredient.objects.create(name=name,
+                                           quantity=quantity,
+                                           price=price,
+                                           function=function,
+                                           unit=unit,
+                                           is_used=is_used)
+    return ingredient
 
 
 INGREDIENT_URL = reverse('ingredient:ingredient-list')
@@ -77,7 +81,7 @@ class PrivateTestApi(TestCase):
         self.client.force_authenticate(self.user)
 
     def test_create_ingredient_successful(self):
-        function = create_function()
+        create_function()
         payload = {
             'name': 'hello',
             'quantity': 2.0,
@@ -113,13 +117,14 @@ class PrivateTestApi(TestCase):
 
     def test_create_function_inside_ingredient_with_same_name(self):
         create_unit()
+        create_function()
         payload = {
             'name': 'hello',
             'quantity': 2.0,
             'price': 10.30,
             'is_used': True,
             'function': {
-                'name': 'Emulsifier Food'
+                'name': 'Emulsifier'
             },
             'unit': {
                 'name': 'grams',
@@ -133,4 +138,27 @@ class PrivateTestApi(TestCase):
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
 
         self.assertEqual(1, Unit.objects.all().count())
+        self.assertEqual(1, Function.objects.all().count())
+
+    def test_update_function_without_function_and_unit(self):
+        payload = {
+            'name': 'hello',
+            'quantity': 2.0,
+            'function': {
+                'name': 'Surfactant'
+            },
+            'unit': {
+                'name': 'grams',
+                'abbreviation': 'gr',
+                'conversion_rate': 1
+            },
+        }
+        ingredient = create_ingredient()
+        detail_url = detail_ingredient_url(ingredient.id)
+        res = self.client.patch(detail_url, payload, format='json')
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+        self.assertEqual(1, Unit.objects.all().count())
+        self.assertEqual(2, Function.objects.all().count())
+
 
