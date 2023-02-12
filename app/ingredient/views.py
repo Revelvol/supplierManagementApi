@@ -4,12 +4,12 @@ from .serializers import (IngredientSerializer,
                           FunctionSerializer,
                           UnitSerializer,
                           SupplierSerializer,
-                          PicSerializer,)
+                          PicSerializer, )
 from base.models import (Ingredient,
                          Function,
                          Unit,
                          Supplier,
-                         Pic,)
+                         Pic, )
 from rest_framework import viewsets
 from base.permissions import ReadOnly
 
@@ -26,6 +26,29 @@ class IngredientViewSet(BaseViewSet):
     """Manage Ingredient Models"""
     model = Ingredient
     serializer_class = IngredientSerializer
+    queryset = Ingredient.objects.all()
+
+    def _params_to_ints(self, qs):
+        """convert list of strings to integers"""
+        res = [int(str_id) for str_id in qs.split(",")]
+        return res
+
+    def get_queryset(self):
+        queryset = self.queryset
+        supplier = self.request.query_params.get('supplier_id')
+        unit = self.request.query_params.get('unit_id')
+        function = self.request.query_params.get('function_id')
+        if supplier:
+            supplier_id = self._params_to_ints(supplier)
+            queryset = queryset.filter(supplier__id__in=supplier_id)
+
+        if unit:
+            unit_id = self._params_to_ints(unit)
+            queryset = queryset.filter(unit__id__in=unit_id)
+        if function:
+            function_id = self._params_to_ints(function)
+            queryset = queryset.filter(function__id__in=function_id)
+        return queryset
 
 
 class FunctionViewSet(BaseViewSet):
@@ -39,6 +62,7 @@ class UnitViewSet(BaseViewSet):
     model = Unit
     serializer_class = UnitSerializer
 
+
 class SupplierViewSet(BaseViewSet):
     """Manage Supplier Models"""
     model = Supplier
@@ -49,9 +73,3 @@ class PicViewSet(BaseViewSet):
     """Manage Pic Models"""
     model = Pic
     serializer_class = PicSerializer
-
-
-
-
-
-

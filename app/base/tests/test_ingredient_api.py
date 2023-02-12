@@ -1,9 +1,10 @@
 from django.test import TestCase
-from base.models import Ingredient, Function, Unit
+from base.models import Ingredient, Function, Unit, Supplier
 from django.contrib.auth import get_user_model
 from rest_framework.test import APIClient
 from django.urls import reverse
 from rest_framework import status
+from ingredient.serializers import IngredientSerializer
 
 
 def create_user():
@@ -49,6 +50,14 @@ def create_ingredient():
                                            unit=unit,
                                            is_used=is_used)
     return ingredient
+
+
+def create_supplier():
+    name = 'pT. Supplier A'
+    location = 'Indonesia, Jakarta'
+    phone = '+628660942'
+    supplier = Supplier.objects.create(name=name, location=location, phone=phone)
+    return supplier
 
 
 INGREDIENT_URL = reverse('ingredient:ingredient-list')
@@ -115,7 +124,7 @@ class PrivateTestApi(TestCase):
 
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
 
-    def test_create_function_inside_ingredient_with_same_name(self):
+    def test_create_ingredient_with_same_function_name(self):
         create_unit()
         create_function()
         payload = {
@@ -134,13 +143,12 @@ class PrivateTestApi(TestCase):
         }
 
         res = self.client.post(INGREDIENT_URL, payload, format='json')
-
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
 
         self.assertEqual(1, Unit.objects.all().count())
         self.assertEqual(1, Function.objects.all().count())
 
-    def test_update_function_without_function_and_unit(self):
+    def test_update_Ingredient_with_function_and_unit(self):
         payload = {
             'name': 'hello',
             'quantity': 2.0,
@@ -161,4 +169,136 @@ class PrivateTestApi(TestCase):
         self.assertEqual(1, Unit.objects.all().count())
         self.assertEqual(2, Function.objects.all().count())
 
+    def test_filter_ingredient_by_function(self):
+        supplier = create_supplier()
+        function1 = create_function()
+        function2 = Function.objects.create(name='Surfactant')
 
+        ingredient1 = Ingredient.objects.create(name='curry',
+                                                quantity=10.2,
+                                                price=12.3,
+                                                function=function1,
+                                                unit=create_unit(),
+                                                is_used=True,
+                                                supplier=supplier)
+        ingredient2 = Ingredient.objects.create(name='mocaf',
+                                                quantity=20.3,
+                                                price=12.43,
+                                                function=function2,
+                                                unit=create_unit(),
+                                                is_used=True)
+        params = {'function_id': f'{function1.id}'}
+
+        res = self.client.get(INGREDIENT_URL, params)
+
+        i1 = IngredientSerializer(ingredient1)
+        i2 = IngredientSerializer(ingredient2)
+        self.assertIn(i1.data, res.data)
+        self.assertNotIn(i2.data, res.data)
+
+    def test_filter_ingredient_by_supplier(self):
+        supplier = create_supplier()
+
+        ingredient1 = Ingredient.objects.create(name='curry',
+                                                quantity=10.2,
+                                                price=12.3,
+                                                function=create_function(),
+                                                unit=create_unit(),
+                                                is_used=True,
+                                                supplier=supplier)
+        ingredient2 = Ingredient.objects.create(name='mocaf',
+                                                quantity=20.3,
+                                                price=12.43,
+                                                function=create_function(),
+                                                unit=create_unit(),
+                                                is_used=True)
+        params = {'supplier_id': f'{supplier.id}'}
+
+        res = self.client.get(INGREDIENT_URL, params)
+
+        i1 = IngredientSerializer(ingredient1)
+        i2 = IngredientSerializer(ingredient2)
+        self.assertIn(i1.data, res.data)
+        self.assertNotIn(i2.data, res.data)
+
+    def test_filter_ingredient_by_unit(self):
+        supplier = create_supplier()
+        unit1 = create_unit()
+        unit2 = Unit.objects.create(name="tons", abbreviation="tns", conversion_rate=0.001)
+
+        ingredient1 = Ingredient.objects.create(name='curry',
+                                                quantity=10.2,
+                                                price=12.3,
+                                                function=create_function(),
+                                                unit=unit1,
+                                                is_used=True,
+                                                supplier=supplier)
+        ingredient2 = Ingredient.objects.create(name='mocaf',
+                                                quantity=20.3,
+                                                price=12.43,
+                                                function=create_function(),
+                                                unit=unit2,
+                                                is_used=True)
+        params = {'unit_id': f'{unit1.id}'}
+        res = self.client.get(INGREDIENT_URL, params)
+
+        i1 = IngredientSerializer(ingredient1)
+        i2 = IngredientSerializer(ingredient2)
+        self.assertIn(i1.data, res.data)
+        self.assertNotIn(i2.data, res.data)
+
+    def test_ingredient_filter_all(self):
+        supplier = create_supplier()
+        unit1 = create_unit()
+        unit2 = Unit.objects.create(name="tons", abbreviation="tns", conversion_rate=0.001)
+        function1 = create_function()
+        function2 = Function.objects.create(name='Surfactant')
+
+        ingredient1 = Ingredient.objects.create(name='curry',
+                                                quantity=10.2,
+                                                price=12.3,
+                                                function=function1,
+                                                unit=unit1,
+                                                is_used=True,
+                                                supplier=supplier)
+        ingredient2 = Ingredient.objects.create(name='mocaf',
+                                                quantity=20.3,
+                                                price=12.43,
+                                                function=function2,
+                                                unit=unit2,
+                                                is_used=True)
+        params = {'unit_id': f'{unit1.id}', 'supplier_id': f'{supplier.id}', 'function_id': f' {function1.id}'}
+        res = self.client.get(INGREDIENT_URL, params)
+
+        i1 = IngredientSerializer(ingredient1)
+        i2 = IngredientSerializer(ingredient2)
+        self.assertIn(i1.data, res.data)
+        self.assertNotIn(i2.data, res.data)
+
+    def test_ingredient_filter_all_none(self):
+        supplier = create_supplier()
+        unit1 = create_unit()
+        unit2 = Unit.objects.create(name="tons", abbreviation="tns", conversion_rate=0.001)
+        function1 = create_function()
+        function2 = Function.objects.create(name='Surfactant')
+
+        ingredient1 = Ingredient.objects.create(name='curry',
+                                                quantity=10.2,
+                                                price=12.3,
+                                                function=function1,
+                                                unit=unit1,
+                                                is_used=True,
+                                                supplier=supplier)
+        ingredient2 = Ingredient.objects.create(name='mocaf',
+                                                quantity=20.3,
+                                                price=12.43,
+                                                function=function2,
+                                                unit=unit2,
+                                                is_used=True)
+        params = {'unit_id': f'{unit1.id}', 'supplier_id': f'{supplier.id}', 'function_id': f' {function2.id}'}
+        res = self.client.get(INGREDIENT_URL, params)
+
+        i1 = IngredientSerializer(ingredient1)
+        i2 = IngredientSerializer(ingredient2)
+        self.assertNotIn(i1.data, res.data)
+        self.assertNotIn(i2.data, res.data)
