@@ -73,7 +73,7 @@ entity PIC{
 
 
 
-supplier |o--o{ Ingredient : has multiple
+supplier ||--o{ Ingredient : has multiple
 
 supplier ||--o| supplier_document : may have
 

@@ -80,7 +80,7 @@ class Function(models.Model):
 class Unit(models.Model):
     name = models.CharField(max_length=255)
     abbreviation = models.CharField(max_length=5)
-    conversion_rate = models.DecimalField(max_digits=120, decimal_places=2)
+    conversion_rate = models.DecimalField(max_digits=120, decimal_places=10)
 
     class Meta:
         ordering = ['-name']

@@ -3,7 +3,8 @@ from django.contrib.auth import get_user_model
 from rest_framework.test import APIClient
 from rest_framework import status
 from django.urls import reverse
-from base.models import Pic
+from base.models import Pic, Supplier
+from ingredient.serializers import PicSerializer
 
 PIC_URL = reverse('ingredient:pic-list')
 
@@ -32,8 +33,17 @@ def create_pic():
     email = 'test@example.com'
     phone = '+62866094'
     position = 'leader a'
-    pic = Pic.objects.create(name=name, email=email, phone=phone, position=position)
+    supplier = create_supplier()
+    pic = Pic.objects.create(name=name, email=email, phone=phone, position=position, supplier=supplier)
     return pic
+
+
+def create_supplier():
+    name = 'pT. Supplier A'
+    location = 'Indonesia, Jakarta'
+    phone = '+628660942'
+    supplier = Supplier.objects.create(name=name, location=location, phone=phone)
+    return supplier
 
 
 class PublicTestApi(TestCase):
@@ -85,3 +95,27 @@ class PrivateTestApi(TestCase):
         pic.refresh_from_db()
         self.assertEqual(pic.name, payload['name'])
 
+    def test_filter_pic_successfull(self):
+        supplier1 = create_supplier()
+
+        pic1 = Pic.objects.create(name='andi1231232134',
+                                  email='tes123t@example.com',
+                                  phone='+628661213094',
+                                  position='leader a',
+                                  supplier=supplier1)
+        pic2 = Pic.objects.create(name='andi112312',
+                                  email='tes1231t@example.com',
+                                  phone='+628660232394',
+                                  position='leader b',
+                                    )
+        params = {
+            'supplier_id': f'{supplier1.id}'
+        }
+
+        res = self.client.get(PIC_URL, params)
+
+        p1 = PicSerializer(pic1)
+        p2 = PicSerializer(pic2)
+
+        self.assertIn(p1.data, res.data)
+        self.assertNotIn(p2.data, res.data)

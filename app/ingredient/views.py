@@ -12,6 +12,12 @@ from base.models import (Ingredient,
                          Pic, )
 from rest_framework import viewsets
 from base.permissions import ReadOnly
+from drf_spectacular.utils import (
+    extend_schema_view,
+    extend_schema,
+    OpenApiParameter,
+    OpenApiTypes,
+)
 
 
 class BaseViewSet(viewsets.ModelViewSet):
@@ -21,7 +27,22 @@ class BaseViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         return self.model.objects.all()
 
-
+@extend_schema_view(
+    list=extend_schema(
+        parameters=[
+            OpenApiParameter(
+                'function_id',
+                OpenApiTypes.STR,
+                description='Comma separated list of function IDs to filter ingredient',
+            ),
+            OpenApiParameter(
+                'supplier_id',
+                OpenApiTypes.STR,
+                description='Comma separated list of supplier IDs to filter ingredient'
+            )
+        ]
+    )
+)
 class IngredientViewSet(BaseViewSet):
     """Manage Ingredient Models"""
     model = Ingredient
@@ -36,15 +57,10 @@ class IngredientViewSet(BaseViewSet):
     def get_queryset(self):
         queryset = self.queryset
         supplier = self.request.query_params.get('supplier_id')
-        unit = self.request.query_params.get('unit_id')
         function = self.request.query_params.get('function_id')
         if supplier:
             supplier_id = self._params_to_ints(supplier)
             queryset = queryset.filter(supplier__id__in=supplier_id)
-
-        if unit:
-            unit_id = self._params_to_ints(unit)
-            queryset = queryset.filter(unit__id__in=unit_id)
         if function:
             function_id = self._params_to_ints(function)
             queryset = queryset.filter(function__id__in=function_id)
@@ -68,8 +84,31 @@ class SupplierViewSet(BaseViewSet):
     model = Supplier
     serializer_class = SupplierSerializer
 
-
+@extend_schema_view(
+    list=extend_schema(
+        parameters=[
+            OpenApiParameter(
+                'supplier_id',
+                OpenApiTypes.STR,
+                description='Comma separated list of supplier IDs to filter PIC',
+            ),
+        ]
+    )
+)
 class PicViewSet(BaseViewSet):
     """Manage Pic Models"""
     model = Pic
     serializer_class = PicSerializer
+    queryset = Pic.objects.all()
+    def _params_to_ints(self, qs):
+        """convert list of strings to integers"""
+        res = [int(str_id) for str_id in qs.split(",")]
+        return res
+    def get_queryset(self):
+        queryset = self.queryset
+        supplier = self.request.query_params.get('supplier_id')
+        if supplier:
+            supplier_id = self._params_to_ints(supplier)
+            queryset = queryset.filter(supplier__id__in = supplier_id)
+        return queryset
+

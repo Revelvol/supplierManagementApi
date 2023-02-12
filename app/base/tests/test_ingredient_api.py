@@ -221,31 +221,6 @@ class PrivateTestApi(TestCase):
         self.assertIn(i1.data, res.data)
         self.assertNotIn(i2.data, res.data)
 
-    def test_filter_ingredient_by_unit(self):
-        supplier = create_supplier()
-        unit1 = create_unit()
-        unit2 = Unit.objects.create(name="tons", abbreviation="tns", conversion_rate=0.001)
-
-        ingredient1 = Ingredient.objects.create(name='curry',
-                                                quantity=10.2,
-                                                price=12.3,
-                                                function=create_function(),
-                                                unit=unit1,
-                                                is_used=True,
-                                                supplier=supplier)
-        ingredient2 = Ingredient.objects.create(name='mocaf',
-                                                quantity=20.3,
-                                                price=12.43,
-                                                function=create_function(),
-                                                unit=unit2,
-                                                is_used=True)
-        params = {'unit_id': f'{unit1.id}'}
-        res = self.client.get(INGREDIENT_URL, params)
-
-        i1 = IngredientSerializer(ingredient1)
-        i2 = IngredientSerializer(ingredient2)
-        self.assertIn(i1.data, res.data)
-        self.assertNotIn(i2.data, res.data)
 
     def test_ingredient_filter_all(self):
         supplier = create_supplier()
@@ -267,7 +242,7 @@ class PrivateTestApi(TestCase):
                                                 function=function2,
                                                 unit=unit2,
                                                 is_used=True)
-        params = {'unit_id': f'{unit1.id}', 'supplier_id': f'{supplier.id}', 'function_id': f' {function1.id}'}
+        params = { 'supplier_id': f'{supplier.id}', 'function_id': f' {function1.id}'}
         res = self.client.get(INGREDIENT_URL, params)
 
         i1 = IngredientSerializer(ingredient1)
@@ -295,7 +270,7 @@ class PrivateTestApi(TestCase):
                                                 function=function2,
                                                 unit=unit2,
                                                 is_used=True)
-        params = {'unit_id': f'{unit1.id}', 'supplier_id': f'{supplier.id}', 'function_id': f' {function2.id}'}
+        params = { 'supplier_id': f'{supplier.id}', 'function_id': f' {function2.id}'}
         res = self.client.get(INGREDIENT_URL, params)
 
         i1 = IngredientSerializer(ingredient1)

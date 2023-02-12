@@ -25,7 +25,7 @@ class PicSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Pic
-        fields = ['id', 'name', 'position', 'email', 'phone',]
+        fields = ['id', 'name', 'position', 'email', 'phone']
         read_only_fields = ['id']
 
 
