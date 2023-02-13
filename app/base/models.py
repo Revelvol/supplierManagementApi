@@ -131,4 +131,45 @@ class Pic(models.Model):
         return self.name
 
 
+class PicDocument(models.Model):
+    supplier = models.OneToOneField(
+        Supplier,
+        on_delete=models.CASCADE,
+    )
+    isoDocument = models.FileField(null=True)
+    gmpDocument = models.FileField(null=True)
+    haccpDocument = models.FileField(null=True)
+
+    class Meta:
+        pass
+
+    def __str__(self):
+        return "exist"
+
+
+class IngredientDocument(models.Model):
+    supplier = models.OneToOneField(
+        Supplier,
+        on_delete=models.CASCADE,
+    )
+    isoDocument = models.FileField(null=True)
+    gmoDocument = models.FileField(null=True)
+    kosherDocument = models.FileField(null=True)
+    halalDocument = models.FileField(null=True)
+    msdsDocument = models.FileField(null=True)
+    tdsDocument = models.FileField(null=True)
+    coaDocument = models.FileField(null=True)
+    allergenDocument = models.FileField(null=True)
+
+    class Meta:
+        pass
+
+    def __str__(self):
+        return "exist"
+
+
+
+
+
+
 

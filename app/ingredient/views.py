@@ -18,6 +18,11 @@ from drf_spectacular.utils import (
     OpenApiParameter,
     OpenApiTypes,
 )
+def _params_to_ints(qs):
+    """convert list of strings to integers"""
+    res = [int(str_id) for str_id in qs.split(",")]
+    return res
+
 
 
 class BaseViewSet(viewsets.ModelViewSet):
@@ -59,11 +64,6 @@ class IngredientViewSet(BaseViewSet):
     serializer_class = IngredientSerializer
     queryset = Ingredient.objects.all()
 
-    def _params_to_ints(self, qs):
-        """convert list of strings to integers"""
-        res = [int(str_id) for str_id in qs.split(",")]
-        return res
-
     def get_queryset(self):
         queryset = self.queryset
         supplier = self.request.query_params.get('supplier_id')
@@ -80,10 +80,10 @@ class IngredientViewSet(BaseViewSet):
             queryset = queryset.filter(function__isnull=have_function)
 
         if supplier:
-            supplier_id = self._params_to_ints(supplier)
+            supplier_id = _params_to_ints(supplier)
             queryset = queryset.filter(supplier__id__in=supplier_id)
         if function:
-            function_id = self._params_to_ints(function)
+            function_id = _params_to_ints(function)
             queryset = queryset.filter(function__id__in=function_id)
         return queryset.order_by('name')
 
@@ -127,11 +127,6 @@ class PicViewSet(BaseViewSet):
     serializer_class = PicSerializer
     queryset = Pic.objects.all()
 
-    def _params_to_ints(self, qs):
-        """convert list of strings to integers"""
-        res = [int(str_id) for str_id in qs.split(",")]
-        return res
-
     def get_queryset(self):
         queryset = self.queryset
         supplier = self.request.query_params.get('supplier_id')
@@ -141,7 +136,7 @@ class PicViewSet(BaseViewSet):
             have_supplier = False if have_supplier else True
             queryset = queryset.filter(supplier__isnull=have_supplier)
         if supplier:
-            supplier_id = self._params_to_ints(supplier)
+            supplier_id = _params_to_ints(supplier)
             queryset = queryset.filter(supplier__id__in=supplier_id)
         return queryset.order_by('name')
 
