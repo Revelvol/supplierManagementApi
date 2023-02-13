@@ -220,7 +220,7 @@ class PrivateTestApi(TestCase):
         i2 = IngredientSerializer(ingredient2)
         self.assertIn(i1.data, res.data)
         self.assertNotIn(i2.data, res.data)
-#test
+
     def test_ingredient_filter_all(self):
         supplier = create_supplier()
         unit1 = create_unit()
@@ -269,7 +269,119 @@ class PrivateTestApi(TestCase):
                                                 function=function2,
                                                 unit=unit2,
                                                 is_used=True)
-        params = { 'supplier_id': f'{supplier.id}', 'function_id': f' {function2.id}'}
+        params = {'supplier_id': f'{supplier.id}', 'function_id': f' {function2.id}'}
+        res = self.client.get(INGREDIENT_URL, params)
+
+        i1 = IngredientSerializer(ingredient1)
+        i2 = IngredientSerializer(ingredient2)
+        self.assertNotIn(i1.data, res.data)
+        self.assertNotIn(i2.data, res.data)
+
+    def test_ingredient_filter_with_supplier(self):
+        supplier = create_supplier()
+        unit1 = create_unit()
+        unit2 = Unit.objects.create(name="tons", abbreviation="tns", conversion_rate=0.001)
+        function1 = create_function()
+        function2 = Function.objects.create(name='Surfactant')
+
+        ingredient1 = Ingredient.objects.create(name='curry',
+                                                quantity=10.2,
+                                                price=12.3,
+                                                function=function1,
+                                                unit=unit1,
+                                                is_used=True,
+                                                supplier=supplier)
+        ingredient2 = Ingredient.objects.create(name='mocaf',
+                                                quantity=20.3,
+                                                price=12.43,
+                                                function=function2,
+                                                unit=unit2,
+                                                is_used=True)
+        params = {'have_supplier': 1}
+        res = self.client.get(INGREDIENT_URL, params)
+
+        i1 = IngredientSerializer(ingredient1)
+        i2 = IngredientSerializer(ingredient2)
+        self.assertIn(i1.data, res.data)
+        self.assertNotIn(i2.data, res.data)
+
+    def test_ingredient_filter_without_supplier(self):
+        supplier = create_supplier()
+        unit1 = create_unit()
+        unit2 = Unit.objects.create(name="tons", abbreviation="tns", conversion_rate=0.01)
+        function1 = create_function()
+        function2 = Function.objects.create(name='Surfactant')
+
+        ingredient1 = Ingredient.objects.create(name='curry',
+                                                quantity=10.2,
+                                                price=12.3,
+                                                function=function1,
+                                                unit=unit1,
+                                                is_used=True,
+                                                supplier=supplier)
+        ingredient2 = Ingredient.objects.create(name='mocaf',
+                                                quantity=20.3,
+                                                price=12.43,
+                                                function=function2,
+                                                unit=unit2,
+                                                is_used=True)
+        params = {'have_supplier': 0}
+        res = self.client.get(INGREDIENT_URL, params)
+
+        i1 = IngredientSerializer(ingredient1)
+        i2 = IngredientSerializer(ingredient2)
+        self.assertNotIn(i1.data, res.data)
+        self.assertIn(i2.data, res.data)
+
+    def test_ingredient_filter_with_function(self):
+        supplier = create_supplier()
+        unit1 = create_unit()
+        unit2 = Unit.objects.create(name="tons", abbreviation="tns", conversion_rate=0.1)
+        function1 = create_function()
+        function2 = Function.objects.create(name='Surfactant')
+
+        ingredient1 = Ingredient.objects.create(name='curry',
+                                                quantity=10.2,
+                                                price=12.3,
+                                                function=function1,
+                                                unit=unit1,
+                                                is_used=True,
+                                                supplier=supplier)
+        ingredient2 = Ingredient.objects.create(name='mocaf',
+                                                quantity=20.3,
+                                                price=12.43,
+                                                function=function2,
+                                                unit=unit2,
+                                                is_used=True)
+        params = {'have_function': 1}
+        res = self.client.get(INGREDIENT_URL, params)
+
+        i1 = IngredientSerializer(ingredient1)
+        i2 = IngredientSerializer(ingredient2)
+        self.assertIn(i1.data, res.data)
+        self.assertIn(i2.data, res.data)
+
+    def test_ingredient_without_function(self):
+        supplier = create_supplier()
+        unit1 = create_unit()
+        unit2 = Unit.objects.create(name="tons", abbreviation="tns", conversion_rate=0.1)
+        function1 = create_function()
+        function2 = Function.objects.create(name='Surfactant')
+
+        ingredient1 = Ingredient.objects.create(name='curry',
+                                                quantity=10.2,
+                                                price=12.3,
+                                                function=function1,
+                                                unit=unit1,
+                                                is_used=True,
+                                                supplier=supplier)
+        ingredient2 = Ingredient.objects.create(name='mocaf',
+                                                quantity=20.3,
+                                                price=12.43,
+                                                function=function2,
+                                                unit=unit2,
+                                                is_used=True)
+        params = {'have_function': 0}
         res = self.client.get(INGREDIENT_URL, params)
 
         i1 = IngredientSerializer(ingredient1)
