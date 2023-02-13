@@ -131,7 +131,7 @@ class Pic(models.Model):
         return self.name
 
 
-class PicDocument(models.Model):
+class SupplierDocument(models.Model):
     supplier = models.OneToOneField(
         Supplier,
         on_delete=models.CASCADE,
@@ -148,8 +148,8 @@ class PicDocument(models.Model):
 
 
 class IngredientDocument(models.Model):
-    supplier = models.OneToOneField(
-        Supplier,
+    ingredient = models.OneToOneField(
+        Ingredient,
         on_delete=models.CASCADE,
     )
     isoDocument = models.FileField(null=True)
