@@ -1,6 +1,7 @@
 from .models import (User, Ingredient,
                      Function, Supplier,
-                     Pic, Unit)
+                     Pic, Unit,
+                     SupplierDocument, IngredientDocument)
 from django import forms
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
@@ -82,3 +83,5 @@ admin.site.register(Function)
 admin.site.register(Supplier)
 admin.site.register(Pic)
 admin.site.register(Unit)
+admin.site.register(SupplierDocument)
+admin.site.register(IngredientDocument)

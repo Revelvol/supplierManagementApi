@@ -9,7 +9,10 @@ from base.models import (Ingredient,
                          Supplier,
                          Pic,
                          IngredientDocument,
-                         SupplierDocument, )
+                         SupplierDocument,
+                         get_supplier_doc_file_path,
+                         get_ingredient_doc_file_path)
+from unittest.mock import patch
 
 
 def create_user():
@@ -160,3 +163,20 @@ class ModelTestCase(TestCase):
 
         self.assertEqual(document.supplier, supplier)
         self.assertEqual(supplier.supplierdocument, document)
+
+    @patch('base.models.uuid.uuid4')
+    def test_supplier_file_name_uuid(self, mock_uuid):
+        uuid = "uuid"
+        mock_uuid.return_value = uuid
+        file_path = get_supplier_doc_file_path(None, "example.pdf")
+
+        self.assertEqual(file_path, 'supplier_docs/uuid/example_uuid.pdf' )
+
+    @patch('base.models.uuid.uuid4')
+    def test_ingredient_file_name_uuid(self, mock_uuid):
+        uuid = "uuid"
+        mock_uuid.return_value = uuid
+        file_path = get_ingredient_doc_file_path(None, "example.pdf")
+
+        self.assertEqual(file_path, 'ingredient_docs/uuid/example_uuid.pdf')
+

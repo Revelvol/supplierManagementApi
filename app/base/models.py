@@ -1,4 +1,3 @@
-from django.db import models
 from django.contrib.auth.models import (
     BaseUserManager, AbstractBaseUser, PermissionsMixin
 )
@@ -6,7 +5,28 @@ import math
 from django.contrib.auth.models import Group
 from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
+import uuid, os
+from django.core.exceptions import ValidationError
+from django.core.validators import FileExtensionValidator
+from django.utils.translation import gettext_lazy as _
 
+def get_supplier_doc_file_path(instance, filename):
+    """Generate a file path based on a UUID and filename."""
+    unique_id = str(uuid.uuid4())
+    name, ext = os.path.splitext(filename)
+    return f'supplier_docs/{unique_id}/{name}_{unique_id}{ext}'
+
+def get_ingredient_doc_file_path(instance, filename):
+    """Generate a file path based on a UUID and filename."""
+    unique_id = str(uuid.uuid4())
+    name, ext = os.path.splitext(filename)
+    return f'ingredient_docs/{unique_id}/{name}_{unique_id}{ext}'
+def validate_file(field, max_size, allowed_extensions):
+    file = field.file
+    if file.size > max_size:
+        raise ValidationError(_('File size must be under %(max_size)s MB.'), params={'max_size': max_size/15000000})
+    validator = FileExtensionValidator(allowed_extensions=allowed_extensions)
+    validator(field)
 
 class RoundedDecimalField(models.DecimalField):
     def from_db_value(self, value, expression, connection, context):
@@ -136,15 +156,17 @@ class SupplierDocument(models.Model):
         Supplier,
         on_delete=models.CASCADE,
     )
-    isoDocument = models.FileField(null=True)
-    gmpDocument = models.FileField(null=True)
-    haccpDocument = models.FileField(null=True)
+    isoDocument = models.FileField(null=True,
+                                   blank=True,
+                                   upload_to=get_supplier_doc_file_path,)
+    gmpDocument = models.FileField(null=True, blank=True,  upload_to=get_supplier_doc_file_path)
+    haccpDocument = models.FileField(null=True, blank=True, upload_to=get_supplier_doc_file_path)
 
     class Meta:
         pass
 
     def __str__(self):
-        return "exist"
+        return str(self.supplier) + "  documents"
 
 
 class IngredientDocument(models.Model):
@@ -152,20 +174,20 @@ class IngredientDocument(models.Model):
         Ingredient,
         on_delete=models.CASCADE,
     )
-    isoDocument = models.FileField(null=True)
-    gmoDocument = models.FileField(null=True)
-    kosherDocument = models.FileField(null=True)
-    halalDocument = models.FileField(null=True)
-    msdsDocument = models.FileField(null=True)
-    tdsDocument = models.FileField(null=True)
-    coaDocument = models.FileField(null=True)
-    allergenDocument = models.FileField(null=True)
+    isoDocument = models.FileField(null=True, blank=True, upload_to=get_ingredient_doc_file_path)
+    gmoDocument = models.FileField(null=True, blank=True, upload_to=get_ingredient_doc_file_path)
+    kosherDocument = models.FileField(null=True, blank=True, upload_to=get_ingredient_doc_file_path)
+    halalDocument = models.FileField(null=True, blank=True, upload_to=get_ingredient_doc_file_path)
+    msdsDocument = models.FileField(null=True, blank=True, upload_to=get_ingredient_doc_file_path)
+    tdsDocument = models.FileField(null=True, blank=True, upload_to=get_ingredient_doc_file_path)
+    coaDocument = models.FileField(null=True, blank=True, upload_to=get_ingredient_doc_file_path)
+    allergenDocument = models.FileField(null=True, blank=True, upload_to=get_ingredient_doc_file_path)
 
     class Meta:
         pass
 
     def __str__(self):
-        return "exist"
+        return str(self.ingredient) + " documents"
 
 
 
