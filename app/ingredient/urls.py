@@ -4,7 +4,8 @@ from .views import (IngredientViewSet,
                     UnitViewSet,
                     SupplierViewSet,
                     PicViewSet,
-                    SupplierDocumentApiView,)
+                    SupplierDocumentApiView,
+                    IngredientDocumentApiView,)
 from django.urls import path
 
 router = routers.SimpleRouter()
@@ -17,7 +18,8 @@ router.register(r"pic's", PicViewSet, basename='pic')
 app_name = 'ingredient'
 
 urlpatterns = [
-    path('suppliers/<int:id>/upload-document/', SupplierDocumentApiView.as_view(), name = "supplier-document-upload")
+    path('suppliers/<int:id>/upload-document/', SupplierDocumentApiView.as_view(), name = "supplier-document-upload"),
+    path('ingredients/<int:id>/upload-document/', IngredientDocumentApiView.as_view(), name = "ingredient-document-upload")
     ]
 
 urlpatterns += router.urls

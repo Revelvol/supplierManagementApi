@@ -161,6 +161,21 @@ class SupplierDocumentApiView(generics.CreateAPIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+class IngredientDocumentApiView(generics.CreateAPIView):
+    authentication_classes = [authentication.TokenAuthentication]
+    permission_classes = [permissions.IsAdminUser]
+
+    serializer_class = IngredientDocumentSerializer
+
+    def post(self, request, id , *args, **kwargs):
+        serializer = self.get_serializer(data=request.data, context={'ingredient_id': id})
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
 
 
 

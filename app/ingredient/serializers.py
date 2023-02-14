@@ -117,7 +117,19 @@ class SupplierSerializer(serializers.ModelSerializer):
 
 
 class IngredientDocumentSerializer(serializers.ModelSerializer):
-    pass
+    class Meta:
+        model = IngredientDocument
+        fields = ['ingredient', 'isoDocument', 'gmoDocument', 'kosherDocument',
+                  'halalDocument','msdsDocument', 'tdsDocument','coaDocument','allergenDocument',]
+        read_only_fields = ['ingredient']
+
+    def create(self, validated_data):
+        ingredient_document = IngredientDocument.objects.create(
+            ingredient=Ingredient.objects.get(id=int(self.context["ingredient_id"])),
+            **validated_data)
+
+        return ingredient_document
+
 
 class SupplierDocumentSerializer(serializers.ModelSerializer):
     class Meta:
