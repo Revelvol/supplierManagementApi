@@ -1,16 +1,21 @@
-from rest_framework.views import APIView
-from rest_framework import permissions, authentication
+from rest_framework import generics
+from rest_framework import permissions, authentication, status, viewsets
 from .serializers import (IngredientSerializer,
                           FunctionSerializer,
                           UnitSerializer,
                           SupplierSerializer,
-                          PicSerializer, )
+                          PicSerializer,
+                          IngredientDocumentSerializer,
+                          SupplierDocumentSerializer,)
 from base.models import (Ingredient,
                          Function,
                          Unit,
                          Supplier,
-                         Pic, )
-from rest_framework import viewsets
+                         Pic,
+                         SupplierDocument,
+                         IngredientDocument)
+from rest_framework.decorators import action
+from rest_framework.response import Response
 from base.permissions import ReadOnly
 from drf_spectacular.utils import (
     extend_schema_view,
@@ -18,6 +23,7 @@ from drf_spectacular.utils import (
     OpenApiParameter,
     OpenApiTypes,
 )
+
 def _params_to_ints(qs):
     """convert list of strings to integers"""
     res = [int(str_id) for str_id in qs.split(",")]
@@ -121,6 +127,7 @@ class SupplierViewSet(BaseViewSet):
         ]
     )
 )
+
 class PicViewSet(BaseViewSet):
     """Manage Pic Models"""
     model = Pic
@@ -139,4 +146,22 @@ class PicViewSet(BaseViewSet):
             supplier_id = _params_to_ints(supplier)
             queryset = queryset.filter(supplier__id__in=supplier_id)
         return queryset.order_by('name')
+
+
+class SupplierDocumentApiView(generics.CreateAPIView):
+    authentication_classes = [authentication.TokenAuthentication]
+    permission_classes = [permissions.IsAdminUser]
+
+    serializer_class = SupplierDocumentSerializer
+
+    def post(self, request, id , *args, **kwargs):
+        serializer = self.get_serializer(data=request.data, context={'supplier_id': id})
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
 

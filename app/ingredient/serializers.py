@@ -3,7 +3,9 @@ from base.models import (Ingredient,
                          Function,
                          Unit,
                          Supplier,
-                         Pic, )
+                         Pic,
+                         SupplierDocument,
+                         IngredientDocument)
 
 
 class FunctionSerializer(serializers.ModelSerializer):
@@ -82,7 +84,6 @@ class IngredientSerializer(serializers.ModelSerializer):
 
         return ingredient
 
-
 class SupplierSerializer(serializers.ModelSerializer):
     pic = PicSerializer(required=False, many=True, write_only=True)
     ingredient = IngredientSerializer(required=False, many=True, write_only=True)
@@ -109,11 +110,25 @@ class SupplierSerializer(serializers.ModelSerializer):
         return supplier
 
     def update(self, instance, validated_data):
-        pic_data = validated_data.pop('pic', [])
-        ingredient_data = validated_data.pop('ingredient', [])
+        validated_data.pop('pic', [])
+        validated_data.pop('ingredient', [])
         supplier = super().update(instance, validated_data)
         return supplier
 
 
+class IngredientDocumentSerializer(serializers.ModelSerializer):
+    pass
+
+class SupplierDocumentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SupplierDocument
+        fields = ['supplier', 'isoDocument', 'gmpDocument', 'haccpDocument']
+        read_only_fields = [ 'supplier']
+
+    def create(self, validated_data):
+        supplier_document = SupplierDocument.objects.create(supplier=Supplier.objects.get(id=int(self.context["supplier_id"])),
+                                                            **validated_data)
+
+        return supplier_document
 
 
