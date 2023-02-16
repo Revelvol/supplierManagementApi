@@ -4,6 +4,7 @@ from rest_framework.test import APIClient
 from rest_framework import status
 from django.urls import reverse
 from base.models import Supplier, Pic, Ingredient, Unit, Function
+from django.core.files.uploadedfile import SimpleUploadedFile
 
 SUPPLIER_URL = reverse('ingredient:supplier-list')
 
@@ -273,4 +274,31 @@ class PrivateTestApi(TestCase):
         res = self.client.patch(detail_url, payload)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(0, Pic.objects.all().count())
+
+    def test_supplier_document_post_success(self):
+        supplier = create_supplier()
+        url = f'/api/suppliers/{supplier.id}/upload-document/'
+        payload = {
+            'supplier': supplier,
+            'isoDocument': SimpleUploadedFile('iso.pdf', b'pdf_content'),
+            'gmpDocument': SimpleUploadedFile('gmp.pdf', b'pdf_content'),
+            'haccpDocument': SimpleUploadedFile('haccp.pdf', b'pdf_content')
+        }
+        response = self.client.post(url, payload, format='multipart')
+        self.assertEqual(response.status_code, 201)
+
+    def test_get_document(self):
+        supplier = create_supplier()
+        url = f'/api/suppliers/{supplier.id}/upload-document/'
+        payload = {
+            'supplier': supplier,
+            'isoDocument': SimpleUploadedFile('iso.pdf', b'pdf_content'),
+            'gmpDocument': SimpleUploadedFile('gmp.pdf', b'pdf_content'),
+            'haccpDocument': SimpleUploadedFile('haccp.pdf', b'pdf_content')
+        }
+        self.client.post(url, payload, format='multipart')
+        response = self.client.get(url)
+        responseSupplier = response.data['supplier']
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(responseSupplier, supplier.id)
 

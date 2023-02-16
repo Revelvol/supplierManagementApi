@@ -148,10 +148,10 @@ class PicViewSet(BaseViewSet):
         return queryset.order_by('name')
 
 
-class SupplierDocumentApiView(generics.CreateAPIView):
+class SupplierDocumentApiView(generics.CreateAPIView ,generics.RetrieveUpdateAPIView):
     authentication_classes = [authentication.TokenAuthentication]
-    permission_classes = [permissions.IsAdminUser]
-
+    permission_classes = [permissions.IsAdminUser|ReadOnly]
+    lookup_field = 'id'
     serializer_class = SupplierDocumentSerializer
 
     def post(self, request, id , *args, **kwargs):
@@ -161,11 +161,19 @@ class SupplierDocumentApiView(generics.CreateAPIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class IngredientDocumentApiView(generics.CreateAPIView):
-    authentication_classes = [authentication.TokenAuthentication]
-    permission_classes = [permissions.IsAdminUser]
+    def get_object(self):
+        supplier_id = int(self.kwargs.get(self.lookup_field))
+        queryset = SupplierDocument.objects.get(supplier__id=supplier_id)
+        return queryset
 
+from django.db.models.query import prefetch_related_objects
+class IngredientDocumentApiView(generics.CreateAPIView, generics.RetrieveUpdateAPIView):
+    """Upload and Manage one to one relationship of Ingredient Document"""
+    authentication_classes = [authentication.TokenAuthentication]
+    permission_classes = [permissions.IsAdminUser|ReadOnly]
     serializer_class = IngredientDocumentSerializer
+    queryset = IngredientDocument.objects.all()
+    lookup_field = 'id'
 
     def post(self, request, id , *args, **kwargs):
         serializer = self.get_serializer(data=request.data, context={'ingredient_id': id})
@@ -173,6 +181,15 @@ class IngredientDocumentApiView(generics.CreateAPIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def get_object(self):
+        ingredient_id = int(self.kwargs.get(self.lookup_field))
+        queryset = IngredientDocument.objects.get(ingredient__id=ingredient_id)
+        return queryset
+
+
+
+
 
 
 

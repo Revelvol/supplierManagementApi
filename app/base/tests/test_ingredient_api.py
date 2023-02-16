@@ -5,7 +5,7 @@ from rest_framework.test import APIClient
 from django.urls import reverse
 from rest_framework import status
 from ingredient.serializers import IngredientSerializer
-
+from django.core.files.uploadedfile import SimpleUploadedFile
 
 def create_user():
     user = get_user_model().objects.create_user(name='julius',
@@ -388,3 +388,90 @@ class PrivateTestApi(TestCase):
         i2 = IngredientSerializer(ingredient2)
         self.assertNotIn(i1.data, res.data)
         self.assertNotIn(i2.data, res.data)
+
+    def test_post_ingredient_document(self):
+        ingredient = create_ingredient()
+        url = f'/api/ingredients/{ingredient.id}/upload-document/'
+        data = {
+            'ingredient': ingredient,
+            'isoDocument': SimpleUploadedFile('iso.pdf', b'pdf_content'),
+            'gmoDocument': SimpleUploadedFile('gmo.pdf', b'pdf_content'),
+            'kosherDocument': SimpleUploadedFile('kosher.pdf', b'pdf_content'),
+            'halalDocument': SimpleUploadedFile('halal.pdf', b'pdf_content'),
+            'msdsDocument': SimpleUploadedFile('msds.pdf', b'pdf_content'),
+            'tdsDocument': SimpleUploadedFile('tds.pdf', b'pdf_content'),
+            'coaDocument': SimpleUploadedFile('coa.pdf', b'pdf_content'),
+            'allergenDocument': SimpleUploadedFile('allergen.pdf', b'pdf_content')
+        }
+        response = self.client.post(url, data, format='multipart')
+        self.assertEqual(response.status_code, 201)
+
+    def test_get_ingredient_document(self):
+        ingredient = create_ingredient()
+        url = f'/api/ingredients/{ingredient.id}/upload-document/'
+        data = {
+            'ingredient': ingredient,
+            'isoDocument': SimpleUploadedFile('iso.pdf', b'pdf_content'),
+            'gmoDocument': SimpleUploadedFile('gmo.pdf', b'pdf_content'),
+            'kosherDocument': SimpleUploadedFile('kosher.pdf', b'pdf_content'),
+            'halalDocument': SimpleUploadedFile('halal.pdf', b'pdf_content'),
+            'msdsDocument': SimpleUploadedFile('msds.pdf', b'pdf_content'),
+            'tdsDocument': SimpleUploadedFile('tds.pdf', b'pdf_content'),
+            'coaDocument': SimpleUploadedFile('coa.pdf', b'pdf_content'),
+            'allergenDocument': SimpleUploadedFile('allergen.pdf', b'pdf_content')
+        }
+        self.client.post(url, data, format='multipart')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+    def test_patch_ingredient_document(self):
+        ingredient = create_ingredient()
+        url = f'/api/ingredients/{ingredient.id}/upload-document/'
+        data = {
+            'ingredient': ingredient,
+            'isoDocument': SimpleUploadedFile('iso.pdf', b'pdf_content'),
+            'gmoDocument': SimpleUploadedFile('gmo.pdf', b'pdf_content'),
+            'kosherDocument': SimpleUploadedFile('kosher.pdf', b'pdf_content'),
+            'halalDocument': SimpleUploadedFile('halal.pdf', b'pdf_content'),
+            'msdsDocument': SimpleUploadedFile('msds.pdf', b'pdf_content'),
+            'tdsDocument': SimpleUploadedFile('tds.pdf', b'pdf_content'),
+            'coaDocument': SimpleUploadedFile('coa.pdf', b'pdf_content'),
+            'allergenDocument': SimpleUploadedFile('allergen.pdf', b'pdf_content')
+        }
+        response1=self.client.post(url, data, format='multipart')
+        payload = {
+            'isoDocument': SimpleUploadedFile('iso1234.pdf', b'pdf_content'),
+            'gmoDocument': SimpleUploadedFile('gmo1234.pdf', b'pdf_content'),
+        }
+        response2 = self.client.patch(url, payload, format='multipart')
+        self.assertEqual(response2.status_code, 200)
+        self.assertNotEqual(response1.data, response2.data)
+
+    def test_put_ingredient_document(self):
+        ingredient = create_ingredient()
+        url = f'/api/ingredients/{ingredient.id}/upload-document/'
+        data = {
+            'ingredient': ingredient,
+            'isoDocument': SimpleUploadedFile('iso.pdf', b'pdf_content'),
+            'gmoDocument': SimpleUploadedFile('gmo.pdf', b'pdf_content'),
+            'kosherDocument': SimpleUploadedFile('kosher.pdf', b'pdf_content'),
+            'halalDocument': SimpleUploadedFile('halal.pdf', b'pdf_content'),
+            'msdsDocument': SimpleUploadedFile('msds.pdf', b'pdf_content'),
+            'tdsDocument': SimpleUploadedFile('tds.pdf', b'pdf_content'),
+            'coaDocument': SimpleUploadedFile('coa.pdf', b'pdf_content'),
+            'allergenDocument': SimpleUploadedFile('allergen.pdf', b'pdf_content')
+        }
+        response1=self.client.post(url, data, format='multipart')
+        payload = {
+            'isoDocument': SimpleUploadedFile('iso123.pdf', b'pdf_content'),
+            'gmoDocument': SimpleUploadedFile('gmo123.pdf', b'pdf_content'),
+            'kosherDocument': SimpleUploadedFile('kosher123.pdf', b'pdf_content'),
+            'halalDocument': SimpleUploadedFile('hal123al.pdf', b'pdf_content'),
+            'msdsDocument': SimpleUploadedFile('m123sds.pdf', b'pdf_content'),
+            'tdsDocument': SimpleUploadedFile('td123s.pdf', b'pdf_content'),
+            'coaDocument': SimpleUploadedFile('coa123.pdf', b'pdf_content'),
+
+        }
+        response2 = self.client.put(url, payload, format='multipart')
+        self.assertEqual(response2.status_code, 200)
+        self.assertNotEqual(response1.data, response2.data)
