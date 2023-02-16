@@ -31,6 +31,7 @@ entity Function {
 
 entity ingredient_document {
   +ingredient_document_id <<PK>>
+  +ingredient_id<<fk>>
   --
   +necesarryDocument1
   +necesarryDocument2
@@ -56,6 +57,7 @@ entity supplier {
 
 entity supplier_document {
   +suppler_document_id <<PK>>
+  +supplier_id <<fk>>
   --
   +necesarryDocument1
   etc

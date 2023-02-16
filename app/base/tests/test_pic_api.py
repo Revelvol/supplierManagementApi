@@ -95,7 +95,7 @@ class PrivateTestApi(TestCase):
         pic.refresh_from_db()
         self.assertEqual(pic.name, payload['name'])
 
-    def test_filter_pic_successfull(self):
+    def test_filter_pic_successful(self):
         supplier1 = create_supplier()
 
         pic1 = Pic.objects.create(name='andi1231232134',
@@ -119,3 +119,53 @@ class PrivateTestApi(TestCase):
 
         self.assertIn(p1.data, res.data)
         self.assertNotIn(p2.data, res.data)
+
+    def test_filter_pic_with_supplier(self):
+        supplier1 = create_supplier()
+
+        pic1 = Pic.objects.create(name='andi1231232134',
+                                  email='tes123t@example.com',
+                                  phone='+628661213094',
+                                  position='leader a',
+                                  supplier=supplier1)
+        pic2 = Pic.objects.create(name='andi112312',
+                                  email='tes1231t@example.com',
+                                  phone='+628660232394',
+                                  position='leader b',
+                                    )
+        params = {
+            'have_supplier':  1,
+        }
+
+        res = self.client.get(PIC_URL, params)
+
+        p1 = PicSerializer(pic1)
+        p2 = PicSerializer(pic2)
+
+        self.assertIn(p1.data, res.data)
+        self.assertNotIn(p2.data, res.data)
+
+    def test_filter_pic_without_supplier(self):
+        supplier1 = create_supplier()
+
+        pic1 = Pic.objects.create(name='andi1231232134',
+                                  email='tes123t@example.com',
+                                  phone='+628661213094',
+                                  position='leader a',
+                                  supplier=supplier1)
+        pic2 = Pic.objects.create(name='andi112312',
+                                  email='tes1231t@example.com',
+                                  phone='+628660232394',
+                                  position='leader b',
+                                    )
+        params = {
+            'have_supplier':  0,
+        }
+
+        res = self.client.get(PIC_URL, params)
+
+        p1 = PicSerializer(pic1)
+        p2 = PicSerializer(pic2)
+
+        self.assertIn(p2.data, res.data)
+        self.assertNotIn(p1.data, res.data)

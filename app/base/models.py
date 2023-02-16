@@ -1,4 +1,3 @@
-from django.db import models
 from django.contrib.auth.models import (
     BaseUserManager, AbstractBaseUser, PermissionsMixin
 )
@@ -6,7 +5,21 @@ import math
 from django.contrib.auth.models import Group
 from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
+import uuid, os
+from django.core.validators import FileExtensionValidator
 
+
+def get_supplier_doc_file_path(instance, filename):
+    """Generate a file path based on a UUID and filename."""
+    unique_id = str(uuid.uuid4())
+    name, ext = os.path.splitext(filename)
+    return f'supplier_docs/{unique_id}/{name}_{unique_id}{ext}'
+
+def get_ingredient_doc_file_path(instance, filename):
+    """Generate a file path based on a UUID and filename."""
+    unique_id = str(uuid.uuid4())
+    name, ext = os.path.splitext(filename)
+    return f'ingredient_docs/{unique_id}/{name}_{unique_id}{ext}'
 
 class RoundedDecimalField(models.DecimalField):
     def from_db_value(self, value, expression, connection, context):
@@ -129,6 +142,83 @@ class Pic(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class SupplierDocument(models.Model):
+    supplier = models.OneToOneField(
+        Supplier,
+        on_delete=models.CASCADE,
+    )
+    isoDocument = models.FileField(null=True,
+                                   blank=True,
+                                   upload_to=get_supplier_doc_file_path,
+                                   validators=[FileExtensionValidator(['pdf'], message='Only PDF files are allowed.')]
+                                   )
+    gmpDocument = models.FileField(null=True,
+                                   blank=True,
+                                   upload_to=get_supplier_doc_file_path,
+                                   validators=[FileExtensionValidator(['pdf'], message='Only PDF files are allowed.')]
+                                   )
+    haccpDocument = models.FileField(null=True,
+                                     blank=True,
+                                     upload_to=get_supplier_doc_file_path,
+                                     validators=[FileExtensionValidator(['pdf'], message='Only PDF files are allowed.')]
+                                    )
+
+    class Meta:
+        pass
+
+    def __str__(self):
+        return str(self.supplier) + "  documents"
+
+
+class IngredientDocument(models.Model):
+    ingredient = models.OneToOneField(
+        Ingredient,
+        on_delete=models.CASCADE,
+    )
+    isoDocument = models.FileField(null=True,
+                                   blank=True,
+                                   upload_to=get_ingredient_doc_file_path,
+                                   validators=[FileExtensionValidator(['pdf'], message='Only PDF files are allowed.')])
+    gmoDocument = models.FileField(null=True,
+                                   blank=True,
+                                   upload_to=get_ingredient_doc_file_path,
+                                   validators=[FileExtensionValidator(['pdf'], message='Only PDF files are allowed.')])
+    kosherDocument = models.FileField(null=True,
+                                      blank=True,
+                                      upload_to=get_ingredient_doc_file_path,
+                                      validators=[FileExtensionValidator(['pdf'], message='Only PDF files are allowed.')])
+    halalDocument = models.FileField(null=True,
+                                     blank=True,
+                                     upload_to=get_ingredient_doc_file_path,
+                                     validators=[FileExtensionValidator(['pdf'], message='Only PDF files are allowed.')])
+    msdsDocument = models.FileField(null=True,
+                                    blank=True,
+                                    upload_to=get_ingredient_doc_file_path,
+                                    validators=[FileExtensionValidator(['pdf'], message='Only PDF files are allowed.')])
+    tdsDocument = models.FileField(null=True,
+                                   blank=True,
+                                   upload_to=get_ingredient_doc_file_path,
+                                   validators=[FileExtensionValidator(['pdf'], message='Only PDF files are allowed.')])
+    coaDocument = models.FileField(null=True,
+                                   blank=True,
+                                   upload_to=get_ingredient_doc_file_path,
+                                   validators=[FileExtensionValidator(['pdf'], message='Only PDF files are allowed.')])
+    allergenDocument = models.FileField(null=True,
+                                        blank=True,
+                                        upload_to=get_ingredient_doc_file_path,
+                                        validators=[FileExtensionValidator(['pdf'], message='Only PDF files are allowed.')])
+
+    class Meta:
+        pass
+
+    def __str__(self):
+        return str(self.ingredient) + " documents"
+
+
+
+
 
 
 

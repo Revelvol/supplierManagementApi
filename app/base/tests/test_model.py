@@ -7,7 +7,12 @@ from base.models import (Ingredient,
                          Function,
                          Unit,
                          Supplier,
-                         Pic,)
+                         Pic,
+                         IngredientDocument,
+                         SupplierDocument,
+                         get_supplier_doc_file_path,
+                         get_ingredient_doc_file_path)
+from unittest.mock import patch
 
 
 def create_user():
@@ -132,5 +137,46 @@ class ModelTestCase(TestCase):
         self.assertEqual(pic.position, position)
         self.assertEqual(pic.email, email)
 
+    def test_ingredient_document_one_connections(self):
+        name = 'IngredientA Washed up 500'
+        quantity = 1
+        price = 10.20
+        is_used = True
 
+        ingredient = Ingredient.objects.create(name=name,
+                                               quantity=quantity,
+                                               price=price,
+                                               is_used=is_used)
+        document = IngredientDocument.objects.create(ingredient=ingredient)
+
+        self.assertEqual(document.ingredient, ingredient)
+        self.assertEqual(ingredient.ingredientdocument, document)
+
+    def test_supplier_document_one_connection(self):
+        name = 'Hydrochloric Acid'
+        location = 'Bekasi, Indonesia'
+        phone = '+62081231235123'
+        supplier = Supplier.objects.create(name=name,
+                                           location=location,
+                                           phone=phone, )
+        document = SupplierDocument.objects.create(supplier=supplier)
+
+        self.assertEqual(document.supplier, supplier)
+        self.assertEqual(supplier.supplierdocument, document)
+
+    @patch('base.models.uuid.uuid4')
+    def test_supplier_file_name_uuid(self, mock_uuid):
+        uuid = "uuid"
+        mock_uuid.return_value = uuid
+        file_path = get_supplier_doc_file_path(None, "example.pdf")
+
+        self.assertEqual(file_path, 'supplier_docs/uuid/example_uuid.pdf' )
+
+    @patch('base.models.uuid.uuid4')
+    def test_ingredient_file_name_uuid(self, mock_uuid):
+        uuid = "uuid"
+        mock_uuid.return_value = uuid
+        file_path = get_ingredient_doc_file_path(None, "example.pdf")
+
+        self.assertEqual(file_path, 'ingredient_docs/uuid/example_uuid.pdf')
 

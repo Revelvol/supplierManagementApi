@@ -5,7 +5,7 @@ from rest_framework.test import APIClient
 from django.urls import reverse
 from rest_framework import status
 from ingredient.serializers import IngredientSerializer
-
+from django.core.files.uploadedfile import SimpleUploadedFile
 
 def create_user():
     user = get_user_model().objects.create_user(name='julius',
@@ -220,7 +220,7 @@ class PrivateTestApi(TestCase):
         i2 = IngredientSerializer(ingredient2)
         self.assertIn(i1.data, res.data)
         self.assertNotIn(i2.data, res.data)
-#test
+
     def test_ingredient_filter_all(self):
         supplier = create_supplier()
         unit1 = create_unit()
@@ -269,10 +269,209 @@ class PrivateTestApi(TestCase):
                                                 function=function2,
                                                 unit=unit2,
                                                 is_used=True)
-        params = { 'supplier_id': f'{supplier.id}', 'function_id': f' {function2.id}'}
+        params = {'supplier_id': f'{supplier.id}', 'function_id': f' {function2.id}'}
         res = self.client.get(INGREDIENT_URL, params)
 
         i1 = IngredientSerializer(ingredient1)
         i2 = IngredientSerializer(ingredient2)
         self.assertNotIn(i1.data, res.data)
         self.assertNotIn(i2.data, res.data)
+
+    def test_ingredient_filter_with_supplier(self):
+        supplier = create_supplier()
+        unit1 = create_unit()
+        unit2 = Unit.objects.create(name="tons", abbreviation="tns", conversion_rate=0.001)
+        function1 = create_function()
+        function2 = Function.objects.create(name='Surfactant')
+
+        ingredient1 = Ingredient.objects.create(name='curry',
+                                                quantity=10.2,
+                                                price=12.3,
+                                                function=function1,
+                                                unit=unit1,
+                                                is_used=True,
+                                                supplier=supplier)
+        ingredient2 = Ingredient.objects.create(name='mocaf',
+                                                quantity=20.3,
+                                                price=12.43,
+                                                function=function2,
+                                                unit=unit2,
+                                                is_used=True)
+        params = {'have_supplier': 1}
+        res = self.client.get(INGREDIENT_URL, params)
+
+        i1 = IngredientSerializer(ingredient1)
+        i2 = IngredientSerializer(ingredient2)
+        self.assertIn(i1.data, res.data)
+        self.assertNotIn(i2.data, res.data)
+
+    def test_ingredient_filter_without_supplier(self):
+        supplier = create_supplier()
+        unit1 = create_unit()
+        unit2 = Unit.objects.create(name="tons", abbreviation="tns", conversion_rate=0.01)
+        function1 = create_function()
+        function2 = Function.objects.create(name='Surfactant')
+
+        ingredient1 = Ingredient.objects.create(name='curry',
+                                                quantity=10.2,
+                                                price=12.3,
+                                                function=function1,
+                                                unit=unit1,
+                                                is_used=True,
+                                                supplier=supplier)
+        ingredient2 = Ingredient.objects.create(name='mocaf',
+                                                quantity=20.3,
+                                                price=12.43,
+                                                function=function2,
+                                                unit=unit2,
+                                                is_used=True)
+        params = {'have_supplier': 0}
+        res = self.client.get(INGREDIENT_URL, params)
+
+        i1 = IngredientSerializer(ingredient1)
+        i2 = IngredientSerializer(ingredient2)
+        self.assertNotIn(i1.data, res.data)
+        self.assertIn(i2.data, res.data)
+
+    def test_ingredient_filter_with_function(self):
+        supplier = create_supplier()
+        unit1 = create_unit()
+        unit2 = Unit.objects.create(name="tons", abbreviation="tns", conversion_rate=0.1)
+        function1 = create_function()
+        function2 = Function.objects.create(name='Surfactant')
+
+        ingredient1 = Ingredient.objects.create(name='curry',
+                                                quantity=10.2,
+                                                price=12.3,
+                                                function=function1,
+                                                unit=unit1,
+                                                is_used=True,
+                                                supplier=supplier)
+        ingredient2 = Ingredient.objects.create(name='mocaf',
+                                                quantity=20.3,
+                                                price=12.43,
+                                                function=function2,
+                                                unit=unit2,
+                                                is_used=True)
+        params = {'have_function': 1}
+        res = self.client.get(INGREDIENT_URL, params)
+
+        i1 = IngredientSerializer(ingredient1)
+        i2 = IngredientSerializer(ingredient2)
+        self.assertIn(i1.data, res.data)
+        self.assertIn(i2.data, res.data)
+
+    def test_ingredient_without_function(self):
+        supplier = create_supplier()
+        unit1 = create_unit()
+        unit2 = Unit.objects.create(name="tons", abbreviation="tns", conversion_rate=0.1)
+        function1 = create_function()
+        function2 = Function.objects.create(name='Surfactant')
+
+        ingredient1 = Ingredient.objects.create(name='curry',
+                                                quantity=10.2,
+                                                price=12.3,
+                                                function=function1,
+                                                unit=unit1,
+                                                is_used=True,
+                                                supplier=supplier)
+        ingredient2 = Ingredient.objects.create(name='mocaf',
+                                                quantity=20.3,
+                                                price=12.43,
+                                                function=function2,
+                                                unit=unit2,
+                                                is_used=True)
+        params = {'have_function': 0}
+        res = self.client.get(INGREDIENT_URL, params)
+
+        i1 = IngredientSerializer(ingredient1)
+        i2 = IngredientSerializer(ingredient2)
+        self.assertNotIn(i1.data, res.data)
+        self.assertNotIn(i2.data, res.data)
+
+    def test_post_ingredient_document(self):
+        ingredient = create_ingredient()
+        url = f'/api/ingredients/{ingredient.id}/upload-document/'
+        data = {
+            'ingredient': ingredient,
+            'isoDocument': SimpleUploadedFile('iso.pdf', b'pdf_content'),
+            'gmoDocument': SimpleUploadedFile('gmo.pdf', b'pdf_content'),
+            'kosherDocument': SimpleUploadedFile('kosher.pdf', b'pdf_content'),
+            'halalDocument': SimpleUploadedFile('halal.pdf', b'pdf_content'),
+            'msdsDocument': SimpleUploadedFile('msds.pdf', b'pdf_content'),
+            'tdsDocument': SimpleUploadedFile('tds.pdf', b'pdf_content'),
+            'coaDocument': SimpleUploadedFile('coa.pdf', b'pdf_content'),
+            'allergenDocument': SimpleUploadedFile('allergen.pdf', b'pdf_content')
+        }
+        response = self.client.post(url, data, format='multipart')
+        self.assertEqual(response.status_code, 201)
+
+    def test_get_ingredient_document(self):
+        ingredient = create_ingredient()
+        url = f'/api/ingredients/{ingredient.id}/upload-document/'
+        data = {
+            'ingredient': ingredient,
+            'isoDocument': SimpleUploadedFile('iso.pdf', b'pdf_content'),
+            'gmoDocument': SimpleUploadedFile('gmo.pdf', b'pdf_content'),
+            'kosherDocument': SimpleUploadedFile('kosher.pdf', b'pdf_content'),
+            'halalDocument': SimpleUploadedFile('halal.pdf', b'pdf_content'),
+            'msdsDocument': SimpleUploadedFile('msds.pdf', b'pdf_content'),
+            'tdsDocument': SimpleUploadedFile('tds.pdf', b'pdf_content'),
+            'coaDocument': SimpleUploadedFile('coa.pdf', b'pdf_content'),
+            'allergenDocument': SimpleUploadedFile('allergen.pdf', b'pdf_content')
+        }
+        self.client.post(url, data, format='multipart')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+    def test_patch_ingredient_document(self):
+        ingredient = create_ingredient()
+        url = f'/api/ingredients/{ingredient.id}/upload-document/'
+        data = {
+            'ingredient': ingredient,
+            'isoDocument': SimpleUploadedFile('iso.pdf', b'pdf_content'),
+            'gmoDocument': SimpleUploadedFile('gmo.pdf', b'pdf_content'),
+            'kosherDocument': SimpleUploadedFile('kosher.pdf', b'pdf_content'),
+            'halalDocument': SimpleUploadedFile('halal.pdf', b'pdf_content'),
+            'msdsDocument': SimpleUploadedFile('msds.pdf', b'pdf_content'),
+            'tdsDocument': SimpleUploadedFile('tds.pdf', b'pdf_content'),
+            'coaDocument': SimpleUploadedFile('coa.pdf', b'pdf_content'),
+            'allergenDocument': SimpleUploadedFile('allergen.pdf', b'pdf_content')
+        }
+        response1=self.client.post(url, data, format='multipart')
+        payload = {
+            'isoDocument': SimpleUploadedFile('iso1234.pdf', b'pdf_content'),
+            'gmoDocument': SimpleUploadedFile('gmo1234.pdf', b'pdf_content'),
+        }
+        response2 = self.client.patch(url, payload, format='multipart')
+        self.assertEqual(response2.status_code, 200)
+        self.assertNotEqual(response1.data, response2.data)
+
+    def test_put_ingredient_document(self):
+        ingredient = create_ingredient()
+        url = f'/api/ingredients/{ingredient.id}/upload-document/'
+        data = {
+            'ingredient': ingredient,
+            'isoDocument': SimpleUploadedFile('iso.pdf', b'pdf_content'),
+            'gmoDocument': SimpleUploadedFile('gmo.pdf', b'pdf_content'),
+            'kosherDocument': SimpleUploadedFile('kosher.pdf', b'pdf_content'),
+            'halalDocument': SimpleUploadedFile('halal.pdf', b'pdf_content'),
+            'msdsDocument': SimpleUploadedFile('msds.pdf', b'pdf_content'),
+            'tdsDocument': SimpleUploadedFile('tds.pdf', b'pdf_content'),
+            'coaDocument': SimpleUploadedFile('coa.pdf', b'pdf_content'),
+            'allergenDocument': SimpleUploadedFile('allergen.pdf', b'pdf_content')
+        }
+        response1=self.client.post(url, data, format='multipart')
+        payload = {
+            'isoDocument': SimpleUploadedFile('iso123.pdf', b'pdf_content'),
+            'gmoDocument': SimpleUploadedFile('gmo123.pdf', b'pdf_content'),
+            'kosherDocument': SimpleUploadedFile('kosher123.pdf', b'pdf_content'),
+            'halalDocument': SimpleUploadedFile('hal123al.pdf', b'pdf_content'),
+            'msdsDocument': SimpleUploadedFile('m123sds.pdf', b'pdf_content'),
+            'tdsDocument': SimpleUploadedFile('td123s.pdf', b'pdf_content'),
+            'coaDocument': SimpleUploadedFile('coa123.pdf', b'pdf_content'),
+
+        }
+        response2 = self.client.put(url, payload, format='multipart')
+        self.assertEqual(response2.status_code, 200)
+        self.assertNotEqual(response1.data, response2.data)
