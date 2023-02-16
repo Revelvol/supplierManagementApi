@@ -29,6 +29,9 @@ The following endpoints are available for use in the Supplier Management API:
 - `/api/units` - Manage Ingredient Units 
 - `/api/function` - Manage Ingredient Function 
 - `/api/user` - Manage user
+- `/api/suppliers/{id}/upload-documents` - Upload supplier document to the suplier.id
+- `/api/ingredients/{id}/upload-documents` - Upload ingredients document to the ingredient.id
+
 
 Filtering could also be conducted based on the query parameters:
 1. filter ingredient based on supplier id, function id

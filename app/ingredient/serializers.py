@@ -142,6 +142,3 @@ class SupplierDocumentSerializer(serializers.ModelSerializer):
                                                             **validated_data)
 
         return supplier_document
-
-
-
