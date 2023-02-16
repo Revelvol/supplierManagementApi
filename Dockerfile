@@ -15,7 +15,11 @@ RUN python -m venv /py &&\
       adduser \
         --disabled-password \
         --no-create-home \
-        myuser
+        myuser && \
+      mkdir -p /vol/media &&\
+      mkdir -p /vol/static &&\
+      chown -R myuser:myuser /vol &&\
+      chmod -R 755/vol 
 
 ENV PATH="/py/bin:$PATH"
 USER myuser
