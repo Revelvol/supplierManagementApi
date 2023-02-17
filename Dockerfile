@@ -19,7 +19,7 @@ RUN python -m venv /py &&\
       mkdir -p /vol/media &&\
       mkdir -p /vol/static &&\
       chown -R myuser:myuser /vol &&\
-      chmod -R 755/vol 
+      chmod -R 755 /vol 
 
 ENV PATH="/py/bin:$PATH"
 USER myuser
