@@ -25,6 +25,7 @@ To start using the Supplier Management API, follow the steps below:
 ## Endpoints
 The following endpoints are available for use in the Supplier Management API:
 ![image](https://user-images.githubusercontent.com/111274957/220532891-24f6d30a-eed4-437b-8b89-dad6115c973a.png)
+api ui : /api/schema/swagger-ui/
 - `/api/suppliers` - Manage suppliers
 - `/api/pic's` - Manage supplier contacts
 - `/api/ingredients` - Manage Ingredients
