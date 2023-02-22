@@ -10,6 +10,7 @@ services:
       - DB_NAME=supplierManagementDB
       - DB_PASSWORD=postgres
       - DB_HOST=db
+      - DEBUG=1
 
     command: >
       sh -c " python manage.py wait_for_db &&
@@ -17,7 +18,7 @@ services:
               python manage.py runserver 0.0.0.0:8000"
     volumes:
       - ./app:/app
-
+      - static-media-data:/vol
     user: myuser
 
     depends_on:
@@ -35,4 +36,5 @@ services:
       - POSTGRES_DB=supplierManagementDB
 volumes:
   dev-db-data:
+  static-media-data:
 

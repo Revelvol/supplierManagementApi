@@ -7,6 +7,9 @@ WORKDIR /app
 COPY requirements.txt /tmp/requirements.txt
 COPY requirements.dev.txt /tmp/requirements.dev.txt
 COPY app  /app
+COPY scripts /scripts
+
+ARG DEV=false
 #install dependencies
 RUN python -m venv /py &&\
     /py/bin/pip install --upgrade pip &&\
@@ -15,7 +18,14 @@ RUN python -m venv /py &&\
       adduser \
         --disabled-password \
         --no-create-home \
-        myuser
+        myuser && \
+      mkdir -p /vol/media &&\
+      mkdir -p /vol/static &&\
+      chown -R myuser:myuser /vol &&\
+      chmod -R 755 /vol &&\
+      chmod -R +x /scripts
 
-ENV PATH="/py/bin:$PATH"
+ENV PATH="/scripts:/py/bin:$PATH"
 USER myuser
+
+CMD ["run.sh"]
