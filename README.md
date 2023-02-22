@@ -43,7 +43,10 @@ Filtering could also be conducted based on the query parameters:
 4. filter ingredient if they have supplier and/or function or not 
 
 ## Request & Response Formats
-The API uses standard HTTP request and response formats. Requests and responses are in JSON format.
+The API uses standard HTTP request and response formats. Requests and responses are in JSON format
+
+## Deployment
+live server were deployed on the amazon ec2 server with ssh key 
 
 ## Authentication
 The API uses Django Token Authentication for authentication. To access the write API, a Django Token Authentication token must be included in the header of each request.
