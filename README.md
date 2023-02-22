@@ -2,6 +2,8 @@
 
 This API provides functionality for managing suppliers, supplier contacts, ingredients, and associated functions. The API is designed to allow users to upload necessary documents for ingredients and suppliers, and to manage their information and relationships in a centralized and organized manner.
 
+![image](https://user-images.githubusercontent.com/111274957/220533050-6b6a341f-781d-4d39-9a6d-de8694c4aecf.png)
+
 ## Features
 - Manage suppliers and supplier contacts
 - Manage ingredients and their associated documents
@@ -22,7 +24,7 @@ To start using the Supplier Management API, follow the steps below:
 
 ## Endpoints
 The following endpoints are available for use in the Supplier Management API:
-
+![image](https://user-images.githubusercontent.com/111274957/220532891-24f6d30a-eed4-437b-8b89-dad6115c973a.png)
 - `/api/suppliers` - Manage suppliers
 - `/api/pic's` - Manage supplier contacts
 - `/api/ingredients` - Manage Ingredients
