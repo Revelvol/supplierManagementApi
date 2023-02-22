@@ -10,6 +10,7 @@ services:
       - DB_NAME=supplierManagementDB
       - DB_PASSWORD=postgres
       - DB_HOST=db
+      - DEBUG=1
 
     command: >
       sh -c " python manage.py wait_for_db &&
