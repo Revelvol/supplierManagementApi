@@ -31,7 +31,7 @@ class RoundedDecimalField(models.DecimalField):
 
 
 class MyUserManager(BaseUserManager):
-    def create_user(self, email, name=None, password=None, *args, **kwargs):
+    def create_user(self, email, name=None, password=None, is_staff=False, *args, **kwargs):
         """
         Creates and saves a User with the given email, date of
         birth and password.
@@ -42,6 +42,7 @@ class MyUserManager(BaseUserManager):
         user = self.model(
             email=self.normalize_email(email),
             name=name,
+            is_staff=is_staff,
         )
         user.set_password(password)
 
