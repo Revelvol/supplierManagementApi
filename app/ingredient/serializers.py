@@ -37,10 +37,10 @@ class IngredientSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Ingredient
-        fields = ['id', 'name',
+        fields = ['id', 'supplier', 'name',
                   'price', 'quantity',
                   'is_used', 'function', 'unit']
-        read_only_fields = ['id', 'is_used', ]
+        read_only_fields = ['id', ]
 
     def _find_and_create_unit(self, unit_data): # still have bug where the returned value is still updated
         unit, created = Unit.objects.get_or_create(
