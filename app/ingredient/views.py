@@ -23,6 +23,7 @@ from drf_spectacular.utils import (
     OpenApiParameter,
     OpenApiTypes,
 )
+from django.http import Http404
 
 def _params_to_ints(qs):
     """convert list of strings to integers"""
@@ -163,8 +164,11 @@ class SupplierDocumentApiView(generics.CreateAPIView ,generics.RetrieveUpdateAPI
 
     def get_object(self):
         supplier_id = int(self.kwargs.get(self.lookup_field))
-        queryset = SupplierDocument.objects.get(supplier__id=supplier_id)
-        return queryset
+        try:
+            queryset = SupplierDocument.objects.get(supplier__id=supplier_id)
+            return queryset
+        except SupplierDocument.DoesNotExist:
+            raise Http404("supplier document not found ")
 
 from django.db.models.query import prefetch_related_objects
 class IngredientDocumentApiView(generics.CreateAPIView, generics.RetrieveUpdateAPIView):
