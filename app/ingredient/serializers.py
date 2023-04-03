@@ -24,7 +24,6 @@ class UnitSerializer(serializers.ModelSerializer):
 
 
 class PicSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Pic
         fields = ['id', 'name', 'position', 'email', 'phone']
@@ -42,7 +41,7 @@ class IngredientSerializer(serializers.ModelSerializer):
                   'is_used', 'function', 'unit']
         read_only_fields = ['id', ]
 
-    def _find_and_create_unit(self, unit_data): # still have bug where the returned value is still updated
+    def _find_and_create_unit(self, unit_data):  # still have bug where the returned value is still updated
         unit, created = Unit.objects.get_or_create(
             name=unit_data.get('name'),
             defaults={
@@ -58,21 +57,26 @@ class IngredientSerializer(serializers.ModelSerializer):
 
         return unit
 
-
     def create(self, validated_data):
         function_data = validated_data.pop('function', {})
         unit_data = validated_data.pop('unit', {})
+        supplier_id = validated_data.pop('supplier', {})
 
-        function , created = Function.objects.get_or_create(**function_data)
+        function, created = Function.objects.get_or_create(**function_data)
+
         unit = self._find_and_create_unit(unit_data=unit_data)
-
-        ingredient = Ingredient.objects.create(function=function
-                                               , unit=unit, **validated_data)
+        if supplier_id:
+            ingredient = Ingredient.objects.create(function=function
+                                                   , unit=unit, supplier=supplier_id,
+                                                   **validated_data)
+        else:
+            ingredient = Ingredient.objects.create(function=function
+                                                   , unit=unit, **validated_data)
 
         return ingredient
 
     def update(self, instance, validated_data):
-        function_data = validated_data.pop('function',{})
+        function_data = validated_data.pop('function', {})
         unit_data = validated_data.pop('unit', {})
 
         function, created = Function.objects.get_or_create(**function_data)
@@ -83,6 +87,7 @@ class IngredientSerializer(serializers.ModelSerializer):
         ingredient.unit = unit
 
         return ingredient
+
 
 class SupplierSerializer(serializers.ModelSerializer):
     pic = PicSerializer(required=False, many=True, write_only=True)
@@ -120,7 +125,7 @@ class IngredientDocumentSerializer(serializers.ModelSerializer):
     class Meta:
         model = IngredientDocument
         fields = ['ingredient', 'isoDocument', 'gmoDocument', 'kosherDocument',
-                  'halalDocument','msdsDocument', 'tdsDocument','coaDocument','allergenDocument',]
+                  'halalDocument', 'msdsDocument', 'tdsDocument', 'coaDocument', 'allergenDocument', ]
         read_only_fields = ['ingredient']
 
     def create(self, validated_data):
@@ -135,10 +140,11 @@ class SupplierDocumentSerializer(serializers.ModelSerializer):
     class Meta:
         model = SupplierDocument
         fields = ['supplier', 'isoDocument', 'gmpDocument', 'haccpDocument']
-        read_only_fields = [ 'supplier']
+        read_only_fields = ['supplier']
 
     def create(self, validated_data):
-        supplier_document = SupplierDocument.objects.create(supplier=Supplier.objects.get(id=int(self.context["supplier_id"])),
-                                                            **validated_data)
+        supplier_document = SupplierDocument.objects.create(
+            supplier=Supplier.objects.get(id=int(self.context["supplier_id"])),
+            **validated_data)
 
         return supplier_document
