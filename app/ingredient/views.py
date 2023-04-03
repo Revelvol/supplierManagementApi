@@ -188,9 +188,11 @@ class IngredientDocumentApiView(generics.CreateAPIView, generics.RetrieveUpdateA
 
     def get_object(self):
         ingredient_id = int(self.kwargs.get(self.lookup_field))
-        queryset = IngredientDocument.objects.get(ingredient__id=ingredient_id)
-        return queryset
-
+        try:
+            queryset = IngredientDocument.objects.get(ingredient__id=ingredient_id)
+            return queryset
+        except IngredientDocument.DoesNotExist:
+            raise Http404("Ingredient document not found ")
 
 
 
