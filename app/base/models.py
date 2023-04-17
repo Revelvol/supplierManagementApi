@@ -15,11 +15,13 @@ def get_supplier_doc_file_path(instance, filename):
     name, ext = os.path.splitext(filename)
     return f'supplier_docs/{unique_id}/{name}_{unique_id}{ext}'
 
+
 def get_ingredient_doc_file_path(instance, filename):
     """Generate a file path based on a UUID and filename."""
     unique_id = str(uuid.uuid4())
     name, ext = os.path.splitext(filename)
     return f'ingredient_docs/{unique_id}/{name}_{unique_id}{ext}'
+
 
 class RoundedDecimalField(models.DecimalField):
     def from_db_value(self, value, expression, connection, context):
@@ -123,6 +125,7 @@ class Ingredient(models.Model):
     supplier = models.ForeignKey(Supplier, null=True, on_delete=models.CASCADE)
     function = models.ForeignKey(Function, null=True, on_delete=models.SET_NULL)
     unit = models.ForeignKey(Unit, null=True, on_delete=models.SET_NULL)
+
     class Meta:
         ordering = ['-name']
 
@@ -139,7 +142,6 @@ class Pic(models.Model):
 
     class Meta:
         ordering = ['-name']
-
 
     def __str__(self):
         return self.name
@@ -164,7 +166,7 @@ class SupplierDocument(models.Model):
                                      blank=True,
                                      upload_to=get_supplier_doc_file_path,
                                      validators=[FileExtensionValidator(['pdf'], message='Only PDF files are allowed.')]
-                                    )
+                                     )
 
     class Meta:
         pass
@@ -189,11 +191,13 @@ class IngredientDocument(models.Model):
     kosherDocument = models.FileField(null=True,
                                       blank=True,
                                       upload_to=get_ingredient_doc_file_path,
-                                      validators=[FileExtensionValidator(['pdf'], message='Only PDF files are allowed.')])
+                                      validators=[
+                                          FileExtensionValidator(['pdf'], message='Only PDF files are allowed.')])
     halalDocument = models.FileField(null=True,
                                      blank=True,
                                      upload_to=get_ingredient_doc_file_path,
-                                     validators=[FileExtensionValidator(['pdf'], message='Only PDF files are allowed.')])
+                                     validators=[
+                                         FileExtensionValidator(['pdf'], message='Only PDF files are allowed.')])
     msdsDocument = models.FileField(null=True,
                                     blank=True,
                                     upload_to=get_ingredient_doc_file_path,
@@ -209,17 +213,11 @@ class IngredientDocument(models.Model):
     allergenDocument = models.FileField(null=True,
                                         blank=True,
                                         upload_to=get_ingredient_doc_file_path,
-                                        validators=[FileExtensionValidator(['pdf'], message='Only PDF files are allowed.')])
+                                        validators=[
+                                            FileExtensionValidator(['pdf'], message='Only PDF files are allowed.')])
 
     class Meta:
         pass
 
     def __str__(self):
         return str(self.ingredient) + " documents"
-
-
-
-
-
-
-

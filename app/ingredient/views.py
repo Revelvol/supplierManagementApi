@@ -6,7 +6,7 @@ from .serializers import (IngredientSerializer,
                           SupplierSerializer,
                           PicSerializer,
                           IngredientDocumentSerializer,
-                          SupplierDocumentSerializer,)
+                          SupplierDocumentSerializer, )
 from base.models import (Ingredient,
                          Function,
                          Unit,
@@ -25,11 +25,11 @@ from drf_spectacular.utils import (
 )
 from django.http import Http404
 
+
 def _params_to_ints(qs):
     """convert list of strings to integers"""
     res = [int(str_id) for str_id in qs.split(",")]
     return res
-
 
 
 class BaseViewSet(viewsets.ModelViewSet):
@@ -38,6 +38,7 @@ class BaseViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return self.model.objects.all()
+
 
 @extend_schema_view(
     list=extend_schema(
@@ -112,6 +113,7 @@ class SupplierViewSet(BaseViewSet):
     model = Supplier
     serializer_class = SupplierSerializer
 
+
 @extend_schema_view(
     list=extend_schema(
         parameters=[
@@ -128,7 +130,6 @@ class SupplierViewSet(BaseViewSet):
         ]
     )
 )
-
 class PicViewSet(BaseViewSet):
     """Manage Pic Models"""
     model = Pic
@@ -149,13 +150,13 @@ class PicViewSet(BaseViewSet):
         return queryset.order_by('name')
 
 
-class SupplierDocumentApiView(generics.CreateAPIView ,generics.RetrieveUpdateAPIView):
+class SupplierDocumentApiView(generics.CreateAPIView, generics.RetrieveUpdateAPIView):
     authentication_classes = [authentication.TokenAuthentication]
-    permission_classes = [permissions.IsAdminUser|ReadOnly]
+    permission_classes = [permissions.IsAdminUser | ReadOnly]
     lookup_field = 'id'
     serializer_class = SupplierDocumentSerializer
 
-    def post(self, request, id , *args, **kwargs):
+    def post(self, request, id, *args, **kwargs):
         serializer = self.get_serializer(data=request.data, context={'supplier_id': id})
         if serializer.is_valid():
             serializer.save()
@@ -165,21 +166,33 @@ class SupplierDocumentApiView(generics.CreateAPIView ,generics.RetrieveUpdateAPI
     def get_object(self):
         supplier_id = int(self.kwargs.get(self.lookup_field))
         try:
+            supplier = Supplier.objects.get(id=supplier_id)
+        except Supplier.DoesNotExist:
+            raise Http404("Supplier not found")
+        try:
             queryset = SupplierDocument.objects.get(supplier__id=supplier_id)
-            return queryset
         except SupplierDocument.DoesNotExist:
-            raise Http404("supplier document not found ")
+            queryset = SupplierDocument.objects.create(
+                supplier=supplier,
+                isoDocument=None,
+                gmpDocument=None,
+                haccpDocument=None
+            )
+        return queryset
+
 
 from django.db.models.query import prefetch_related_objects
+
+
 class IngredientDocumentApiView(generics.CreateAPIView, generics.RetrieveUpdateAPIView):
     """Upload and Manage one to one relationship of Ingredient Document"""
     authentication_classes = [authentication.TokenAuthentication]
-    permission_classes = [permissions.IsAdminUser|ReadOnly]
+    permission_classes = [permissions.IsAdminUser | ReadOnly]
     serializer_class = IngredientDocumentSerializer
     queryset = IngredientDocument.objects.all()
     lookup_field = 'id'
 
-    def post(self, request, id , *args, **kwargs):
+    def post(self, request, id, *args, **kwargs):
         serializer = self.get_serializer(data=request.data, context={'ingredient_id': id})
         if serializer.is_valid():
             serializer.save()
@@ -189,17 +202,23 @@ class IngredientDocumentApiView(generics.CreateAPIView, generics.RetrieveUpdateA
     def get_object(self):
         ingredient_id = int(self.kwargs.get(self.lookup_field))
         try:
+            ingredient = Ingredient.objects.get(id=ingredient_id)
+        except Ingredient.DoesNotExist:
+            raise Http404("Ingredient not found")
+        try:
             queryset = IngredientDocument.objects.get(ingredient__id=ingredient_id)
-            return queryset
         except IngredientDocument.DoesNotExist:
-            raise Http404("Ingredient document not found ")
-
-
-
-
-
-
-
-
+            queryset = IngredientDocument.objects.create(
+                ingredient=ingredient,
+                isoDocument=None,
+                gmoDocument=None,
+                kosherDocument=None,
+                halalDocument=None,
+                msdsDocument=None,
+                tdsDocument=None,
+                coaDocument=None,
+                allergenDocument=None
+            )
+        return queryset
 
 
