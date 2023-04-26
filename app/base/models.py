@@ -59,6 +59,7 @@ class MyUserManager(BaseUserManager):
         user = self.create_user(
             email=email,
             password=password,
+            is_staff=True
         )
         user.is_superuser = True
         user.save(using=self._db)
