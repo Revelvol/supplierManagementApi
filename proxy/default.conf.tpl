@@ -1,6 +1,10 @@
 server {
+
     listen ${LISTEN_PORT};
 
+    location /.well-known/acme-challenge/ {
+    root /var/www/certbot;
+}
     location /static {
         alias /vol/static; 
     }

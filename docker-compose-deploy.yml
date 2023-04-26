@@ -38,19 +38,21 @@ services:
       - 443:443
     volumes:
       - static-data:/vol
-      - ./certbot/conf:/etc/nginx/ssl
-      - ./certbot/data:/usr/share/nginx/html/letsencrypt
+      - certbot-data:/etc/letsencrypt
+      - certbot-www:/var/www/certbot
+
 
   certbot:
-    image: certbot/certbot:latest
-    command: certonly --webroot -webroot-path=/usr/share/nginx/html/letsencrypt --email julius.sutandi@gmail.com --agree-tos --no-eff-email -d ec2-54-199-2-15.ap-northeast-1.compute.amazonaws.com
+    image: certbot/certbot
+    #command: certonly --webroot -webroot-path=/usr/share/nginx/html/letsencrypt --email julius.sutandi@gmail.com --agree-tos --no-eff-email -d ec2-54-199-2-15.ap-northeast-1.compute.amazonaws.com
     volumes:
-      - ./certbot/data:/usr/share/nginx/html/letsencrypt
-      - ./certbot/conf:/etc/nginx/ssl
-      - ./certbot/logs:/var/log/letsencrypt
-
+      - static-data:/vol
+      - certbot-data:/etc/letsencrypt
+      - certbot-www:/var/www/certbot
 
 
 volumes:
   postgres-data:
   static-data:
+  certbot-data:
+  certbot-www:
