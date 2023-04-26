@@ -41,11 +41,9 @@ services:
       - certbot-data:/usr/share/nginx/html/letsencrypt
       - certbot-conf:/etc/nginx/ssl
 
-
-
   certbot:
     image: certbot/certbot
-    command: certonly --webroot --webroot-path=/etc/letsencrypt --email julius.sutandi@gmail.com --agree-tos --no-eff-email -d revelvolsuppliermanagement.online
+    command: certbot --nginx --email julius.sutandi@gmail.com --agree-tos --no-eff-email -d revelvolsuppliermanagement.online
     volumes:
       - certbot-data:/usr/share/nginx/html/letsencrypt
       - certbot-conf:/etc/letsencrypt
@@ -57,4 +55,3 @@ volumes:
   certbot-data:
   certbot-conf:
   certbot-logs:
-  dhparam:
