@@ -44,7 +44,7 @@ services:
 
   certbot:
     image: certbot/certbot
-    command: certonly --webroot --webroot-path=/etc/letsencrypt --email julius.sutandi@gmail.com --agree-tos --no-eff-email -d ec2-54-199-2-15.ap-northeast-1.compute.amazonaws.com
+    command: certonly --webroot --webroot-path=/etc/letsencrypt --email julius.sutandi@gmail.com --agree-tos --no-eff-email -d revelvolsuppliermanagement.online
     volumes:
       - static-data:/vol
       - certbot-data:/etc/letsencrypt
