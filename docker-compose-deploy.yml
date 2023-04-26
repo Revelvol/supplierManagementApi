@@ -40,6 +40,7 @@ services:
       - static-data:/vol
       - certbot-data:/usr/share/nginx/html/letsencrypt
       - certbot-conf:/etc/nginx/ssl
+    user: root
 
   certbot:
     image: certbot/certbot
@@ -48,6 +49,7 @@ services:
       - certbot-data:/usr/share/nginx/html/letsencrypt
       - certbot-conf:/etc/letsencrypt
       - certbot-logs:/var/log/letsencrypt
+    user: root
 
 volumes:
   postgres-data:
