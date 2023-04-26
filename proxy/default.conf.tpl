@@ -4,7 +4,7 @@ server {
 
     location /.well-known/acme-challenge/ {
         allow-all;
-        root /var/www/certbot;
+        root /usr/share/nginx/html/letsencrypt;
     }
 
 }
