@@ -38,22 +38,21 @@ services:
       - 443:443
     volumes:
       - static-data:/vol
-      - certbot-data:/etc/letsencrypt
-      - certbot-www:/var/www/certbot
+      - certbot-data:/usr/share/nginx/html/letsencrypt
+      - certbot-conf:/etc/nginx/ssl
 
 
   certbot:
     image: certbot/certbot
     command: certonly --webroot --webroot-path=/etc/letsencrypt --email julius.sutandi@gmail.com --agree-tos --no-eff-email -d revelvolsuppliermanagement.online
     volumes:
-      - static-data:/vol
-      - certbot-data:/etc/letsencrypt
-      - certbot-www:/var/www/certbot
-
-
+      - certbot-data:/usr/share/nginx/html/letsencrypt
+      - certbot-conf:/etc/letsencrypt
+      - certbot-logs:/var/log/letsencrypt
 
 volumes:
   postgres-data:
   static-data:
   certbot-data:
-  certbot-www:
+  certbot-conf:
+  certbot-logs:
