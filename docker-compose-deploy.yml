@@ -40,7 +40,6 @@ services:
       - static-data:/vol
       - ./certbot/conf:/etc/nginx/ssl
       - ./certbot/data:/usr/share/nginx/html/letsencrypt
-      - ./dhparam:etc/nginx/dhparam
 
   certbot:
     image: certbot/certbot:latest
