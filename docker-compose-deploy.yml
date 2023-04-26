@@ -35,8 +35,22 @@ services:
       - app
     ports:
       - 80:8000
+      - 443:443
     volumes:
       - static-data:/vol
+      - ./certbot/conf:/etc/nginx/ssl
+      - ./certbot/data:/usr/share/nginx/html/letsencrypt
+      - ./dhparam:etc/nginx/dhparam
+
+  certbot:
+    image: certbot/certbot:latest
+    command: certonly --webroot -webroot-path=/usr/share/nginx/html/letsencrypt --email julius.sutandi@gmail.com --agree-tos --no-eff-email -d ec2-54-199-2-15.ap-northeast-1.compute.amazonaws.com
+    volumes:
+      - ./certbot/data:/usr/share/nginx/html/letsencrypt
+      - ./certbot/conf:/etc/nginx/ssl
+      - ./certbot/logs:/var/log/letsencrypt
+
+
 
 volumes:
   postgres-data:
